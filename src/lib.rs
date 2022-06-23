@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Neg};
 
 #[derive(Debug, PartialEq)]
 pub struct Tuple {
@@ -52,6 +52,14 @@ impl Sub for Tuple {
             z: self.z - other.z,
             w: self.w - other.w,
         }
+    }
+}
+
+impl Neg for Tuple {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self { x: -self.x, y: -self.y, z: -self.z, w: -self.w }
     }
 }
 

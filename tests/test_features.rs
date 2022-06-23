@@ -57,7 +57,7 @@ fn test_sub_points() {
 }
 
 #[test]
-fn sub_vec_from_point() {
+fn test_sub_vec_from_point() {
     let p = point(3., 2., 1.);
     let v = vector(5., 6., 7.);
 
@@ -66,10 +66,25 @@ fn sub_vec_from_point() {
 }
 
 #[test]
-fn sub_vec() {
+fn test_sub_vec() {
     let v1 = vector(3., 2., 1.);
     let v2 = vector(5., 6., 7.);
     let diff = v1 - v2;
 
     assert_eq!(diff, vector(-2., -4., -6.))
+}
+
+#[test]
+fn test_sub_zero() {
+    let zero = vector(0., 0. , 0.);
+    let v = vector(1., -2., -3.);
+    let diff = zero - v;
+
+    assert_eq!(diff, vector(-1., 2., -3.))
+}
+
+#[test]
+fn test_negate() {
+    let a = Tuple::new(1., -2., 3., -4.);
+    assert_eq!(-a, Tuple::new(-1., 2., -3., 4.))
 }
