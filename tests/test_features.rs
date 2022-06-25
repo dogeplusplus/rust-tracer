@@ -1,4 +1,4 @@
-use tracer::{Tuple, point, vector};
+use tracer::{Tuple, point, vector, magnitude, normalize, dot, cross};
 
 #[test]
 fn test_vector_raw() {
@@ -87,4 +87,71 @@ fn test_sub_zero() {
 fn test_negate() {
     let a = Tuple::new(1., -2., 3., -4.);
     assert_eq!(-a, Tuple::new(-1., 2., -3., 4.))
+}
+
+#[test]
+fn test_multiply() {
+    let a = Tuple::new(1., -2., 3., -4.);
+    let result = a * 3.5;
+    assert_eq!(result, Tuple::new(3.5, -7., 10.5, -14.))
+}
+
+#[test]
+fn test_multiply_fraction() {
+    let a = Tuple::new(1., -2., 3., -4.);
+    let result = a * 0.5;
+    assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.))
+}
+
+#[test]
+fn test_divide() {
+    let a = Tuple::new(1., -2., 3., -4.);
+    let result = a / 2.;
+    assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.))
+}
+
+#[test]
+fn test_magnitude() {
+    let v = vector(1., 0., 0.);
+    assert_eq!(magnitude(v), 1.);
+
+    let v = vector(0., 1., 0.);
+    assert_eq!(magnitude(v), 1.);
+
+    let v = vector(0., 0., 1.);
+    assert_eq!(magnitude(v), 1.);
+
+    let v = vector(1., 2., 3.);
+    assert_eq!(magnitude(v), f32::sqrt(14.));
+
+    let v = vector(-1., -2., -3.);
+    assert_eq!(magnitude(v), f32::sqrt(14.));
+}
+
+#[test]
+fn test_normalize() {
+    let v = vector(4., 0., 0.);
+    assert_eq!(normalize(v), vector(1., 0., 0.));
+
+    let v = vector(1., 2., 3.);
+    assert_eq!(normalize(v), vector(1. / f32::sqrt(14.), 2. / f32::sqrt(14.), 3. / f32::sqrt(14.)));
+
+    let norm = normalize(v);
+    assert!((magnitude(norm) - 1.).abs() < f32::EPSILON)
+}
+
+#[test]
+fn test_dot_product() {
+    let a = vector(1., 2., 3.);
+    let b = vector(2., 3., 4.);
+    assert_eq!(dot(a, b), 20.)
+}
+
+#[test]
+fn test_cross_product() {
+    let a = vector(1., 2., 3.);
+    let b = vector(2., 3., 4.);
+
+    assert_eq!(cross(a, b), vector(-1., 2., -1.));
+    assert_eq!(cross(b, a), vector(1., -2., 1.))
 }
