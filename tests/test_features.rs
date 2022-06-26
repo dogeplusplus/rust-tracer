@@ -159,11 +159,7 @@ mod tests {
 
     #[test]
     fn test_color() {
-        let c = Color {
-            red: -0.5,
-            green: 0.4,
-            blue: 1.7,
-        };
+        let c = Color::new(-0.5, 0.4, 1.7);
         assert_eq!(c.red, -0.5);
         assert_eq!(c.green, 0.4);
         assert_eq!(c.blue, 1.7);
@@ -171,86 +167,40 @@ mod tests {
 
     #[test]
     fn test_add_color() {
-        let c1 = Color {
-            red: 0.9,
-            green: 0.6,
-            blue: 0.75,
-        };
-        let c2 = Color {
-            red: 0.7,
-            green: 0.1,
-            blue: 0.25,
-        };
+        let c1 = Color::new(0.9, 0.6, 0.75);
+        let c2 = Color::new(0.7, 0.1, 0.25);
 
         assert_eq!(
             c1 + c2,
-            Color {
-                red: 1.6,
-                green: 0.7,
-                blue: 1.0
-            }
+            Color::new(1.6, 0.7, 1.0)
         )
     }
 
     #[test]
     fn test_sub_color() {
-        let c1 = Color {
-            red: 0.9,
-            green: 0.6,
-            blue: 0.75,
-        };
-        let c2 = Color {
-            red: 0.7,
-            green: 0.1,
-            blue: 0.25,
-        };
-
+        let c1 = Color::new(0.9, 0.6, 0.75);
+        let c2 = Color::new(0.7, 0.1, 0.25);
         assert_eq!(
             c1 - c2,
-            Color {
-                red: 0.2,
-                green: 0.5,
-                blue: 0.5
-            }
+            Color::new(0.2, 0.5, 0.5)
         )
     }
 
     #[test]
     fn test_mul_color_scalar() {
-        let c1 = Color {
-            red: 0.2,
-            green: 0.3,
-            blue: 0.4,
-        };
+        let c1 = Color::new(0.2, 0.3, 0.4);
         assert_eq!(
             c1 * 2.,
-            Color {
-                red: 0.4,
-                green: 0.6,
-                blue: 0.8
-            }
+            Color::new(0.4, 0.6, 0.8)
         )
     }
 
     #[test]
     fn test_mul_color() {
-        let c1 = Color {
-            red: 1.,
-            green: 0.2,
-            blue: 0.4,
-        };
-        let c2 = Color {
-            red: 0.9,
-            green: 1.0,
-            blue: 0.1,
-        };
+        let c1 = Color::new(1.0, 0.2, 0.4);
+        let c2 = Color::new(0.9, 1.0, 0.1);
 
-        let expected = Color {
-            red: 0.9,
-            green: 0.2,
-            blue: 0.04,
-        };
-
+        let expected = Color::new(0.9, 0.2, 0.04);
         assert_eq!(c1 * c2, expected)
     }
 

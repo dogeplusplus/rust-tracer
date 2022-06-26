@@ -1,4 +1,3 @@
-use std::f32::EPSILON;
 use std::fmt;
 use std::fmt::Display;
 use std::cmp::Eq;
@@ -146,7 +145,7 @@ pub fn tick(env: Environment, proj: Projectile) -> Projectile {
     Projectile{position, velocity}
 }
 
-#[derive(Debug, PartialOrd)]
+#[derive(Debug, PartialOrd, Clone, Copy)]
 pub struct Color {
     pub red: f32,
     pub green: f32,
@@ -211,3 +210,9 @@ impl PartialEq for Color {
 }
 
 impl Eq for Color {}
+
+impl Color {
+    pub fn new(red: f32, green: f32, blue: f32) -> Self {
+        Color { red, green, blue }
+    }
+}
