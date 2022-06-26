@@ -1,4 +1,11 @@
+use std::f32::EPSILON;
+use std::fmt;
+use std::fmt::Display;
+use std::cmp::Eq;
 use std::ops::{Add, Sub, Neg, Mul, Div};
+
+pub mod canvas;
+
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
@@ -6,6 +13,12 @@ pub struct Tuple {
     pub y: f32,
     pub z: f32,
     pub w: f32,
+}
+
+impl Display for Tuple {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "x: {}, y: {}, z: {}, w: {}", self.x, self.y, self.z, self.w)
+    }
 }
 
 impl Tuple {
@@ -115,18 +128,86 @@ pub fn cross(a: Tuple, b: Tuple) -> Tuple {
     vector(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x)
 }
 
+#[derive(Debug, Copy, Clone)]
 pub struct Projectile {
-    position: Tuple,
-    velocity: Tuple,
+    pub position: Tuple,
+    pub velocity: Tuple,
 }
 
+#[derive(Debug, Copy, Clone)]
 pub struct Environment {
-    gravity: Tuple,
-    wind: Tuple,
+    pub gravity: Tuple,
+    pub wind: Tuple,
 }
 
-fn tick(env: Environment, proj: Projectile) -> Projectile {
+pub fn tick(env: Environment, proj: Projectile) -> Projectile {
     let position = proj.position + proj.velocity;
     let velocity = proj.velocity + env.gravity + env.wind;
     Projectile{position, velocity}
 }
+
+#[derive(Debug, PartialOrd)]
+pub struct Color {
+    pub red: f32,
+    pub green: f32,
+    pub blue: f32,
+}
+
+impl Add for Color {
+    type Output = Self;
+    
+    fn add(self, rhs: Self) -> Self {
+        Color {
+            red: self.red + rhs.red,
+            green: self.green + rhs.green,
+            blue: self.blue + rhs.blue,
+        }
+    }
+}
+
+impl Sub for Color {
+    type Output = Self;
+    
+    fn sub(self, rhs: Self) -> Self {
+        Color {
+            red: self.red - rhs.red,
+            green: self.green - rhs.green,
+            blue: self.blue - rhs.blue,
+        }
+    }
+}
+
+impl Mul for Color {
+    type Output = Self;
+    
+    fn mul(self, rhs: Self) -> Self {
+        Color {
+            red: self.red * rhs.red,
+            green: self.green * rhs.green,
+            blue: self.blue * rhs.blue,
+        }
+    }
+}
+
+impl Mul<f32> for Color {
+    type Output = Self;
+    
+    fn mul(self, rhs: f32) -> Self {
+        Color {
+            red: self.red * rhs,
+            green: self.green * rhs,
+            blue: self.blue * rhs,
+        }
+    }
+}
+
+impl PartialEq for Color {
+    fn eq(&self, other: &Self) -> bool {
+        let eps = 1e-5;
+        (self.red - other.red).abs() < eps  &&
+        (self.green - other.green).abs() < eps &&
+        (self.blue - other.blue).abs() < eps 
+    }
+}
+
+impl Eq for Color {}
