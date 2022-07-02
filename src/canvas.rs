@@ -33,7 +33,7 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
 
     // Define header
     result.push(String::from("P3"));
-    result.push(format!("{} {}", canvas.width, canvas.height).to_string());
+    result.push(format!("{} {}", canvas.width, canvas.height));
     result.push(String::from("255"));
 
     for row in &canvas.pixels {
@@ -49,14 +49,14 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
                 if row_txt.len() + color_str.len() + 1 > MAX_PPM_LEN {
                     result.push(row_txt.to_string());
                     row_txt = String::new();
-                } else if row_txt.len() > 0 {
-                    row_txt.push_str(" ");
+                } else if !row_txt.is_empty() {
+                    row_txt.push(' ');
                 } 
                 row_txt.push_str(&color_str);
             }
         }
-        if row_txt.len() > 0 {
-            result.push(row_txt.to_string());
+        if !row_txt.is_empty() {
+            result.push(row_txt);
         }
     }
     result
