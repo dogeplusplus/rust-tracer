@@ -10,13 +10,13 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    pub fn new(height: u32, width: u32) -> Self {
+    pub fn new(width: u32, height: u32) -> Self {
         let mut pixels = Vec::new();
         for _ in 0..height {
             pixels.push(vec![Color::new(0.0, 0.0, 0.0); width as usize]);
         }
 
-        Canvas { height, width, pixels }
+        Canvas { width, height, pixels }
     }
 }
 
@@ -33,7 +33,7 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
 
     // Define header
     result.push(String::from("P3"));
-    result.push(format!("{} {}", canvas.height, canvas.width).to_string());
+    result.push(format!("{} {}", canvas.width, canvas.height).to_string());
     result.push(String::from("255"));
 
     for row in &canvas.pixels {
@@ -44,15 +44,15 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
             let green_u8 = (pix.green.clamp(0.0, 1.0) * 255.) as u8;
             let blue_u8 = (pix.blue.clamp(0.0, 1.0) * 255.) as u8;
 
-            let rgb = format!("{} {} {}", red_u8, green_u8, blue_u8);
-            if row_txt.len() + rgb.len() + 1 > MAX_PPM_LEN {
-                result.push(row_txt.to_string());
-                row_txt = String::new();
-            } else {
-                if row_txt.len() > 0 {
+            for color in [red_u8, green_u8, blue_u8].iter() {
+                let color_str = format!("{}", color);
+                if row_txt.len() + color_str.len() + 1 > MAX_PPM_LEN {
+                    result.push(row_txt.to_string());
+                    row_txt = String::new();
+                } else if row_txt.len() > 0 {
                     row_txt.push_str(" ");
-                }
-                row_txt.push_str(&rgb);
+                } 
+                row_txt.push_str(&color_str);
             }
         }
         if row_txt.len() > 0 {

@@ -5,8 +5,8 @@ mod tests {
     #[test]
     fn test_canvas() {
         let c = Canvas::new(10, 20);
-        assert_eq!(c.height, 10);
-        assert_eq!(c.width, 20);
+        assert_eq!(c.width, 10);
+        assert_eq!(c.height, 20);
 
         let black = Color::new(0.0, 0.0, 0.0);
 
@@ -51,12 +51,12 @@ mod tests {
 
         let expected = vec![
             String::from("255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"),
-            String::from("0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"),
+            String::from("0 0 0 0 0 0 0 127 0 0 0 0 0 0 0"),
             String::from("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"),
         ];
         
         let ppm = canvas_to_ppm(&c);
-        assert_eq!(ppm[3..5], expected)
+        assert_eq!(ppm[3..6], expected)
     }
 
     #[test]
@@ -76,7 +76,7 @@ mod tests {
         ];
 
         let ppm = canvas_to_ppm(&c);
-        assert_eq!(ppm, expected)
+        assert_eq!(ppm[3..], expected)
     }
 
 }
