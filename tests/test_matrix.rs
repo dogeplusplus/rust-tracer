@@ -145,4 +145,42 @@ mod tests {
         assert_eq!(expected, a * b);
     }
 
+    #[test]
+    fn test_multiplication_identity() {
+        let a = Matrix::new(vec![
+            vec![0., 1., 2., 4.],
+            vec![1., 2., 4., 8.],
+            vec![2., 4., 8., 16.],
+            vec![4., 8., 16., 32.],
+        ]);
+
+        let identity = Matrix::new(vec![
+            vec![1., 0., 0., 0.],
+            vec![0., 1., 0., 0.],
+            vec![0., 0., 1., 0.],
+            vec![0., 0., 0., 1.],
+        ]);
+        let output = a.clone() * identity;
+        assert_eq!(output, a);
+    }
+
+    #[test]
+    fn test_transpose() {
+        let a = Matrix::new(vec![
+            vec![0., 9., 3., 0.],
+            vec![9., 8., 0., 8.],
+            vec![1., 8., 5., 3.],
+            vec![0., 0., 5., 8.],
+        ]);
+        let expected = Matrix::new(vec![
+            vec![0., 9., 1., 0.],
+            vec![9., 8., 8., 0.],
+            vec![3., 0., 5., 5.],
+            vec![0., 8., 3., 8.],
+        ]);
+
+        let output = a.transpose();
+        assert_eq!(expected, output)
+    }
+
 }

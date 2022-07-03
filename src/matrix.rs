@@ -14,6 +14,22 @@ impl Matrix {
         let columns = mat[0].len();
         Matrix { mat, rows, columns }
     }
+
+    pub fn transpose(&self) -> Self {
+        let rows = self.columns;
+        let columns = self.rows;
+
+        let mut mat = Vec::new();
+        for r in 0..rows {
+            let mut transposed_row = Vec::new(); 
+            for c in 0..columns {
+                transposed_row.push(self[c][r]);
+            }
+            mat.push(transposed_row);
+        }
+
+        Matrix { mat, rows, columns }
+    }
 }
 
 impl Index<usize> for Matrix {
@@ -35,7 +51,7 @@ impl Mul for Matrix {
 
         for r in 0..self.columns {
             let mut product_row = Vec::new();
-            for c in 0..rhs.columns {
+            for c in 0..rhs.rows {
                 let mut entry = 0.;
                 for n in 0..mid {
                     entry += self[r][n] * rhs[n][c];
