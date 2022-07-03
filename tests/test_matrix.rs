@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::matrix::{Matrix};
+    use tracer::matrix::{Matrix, determinant, submatrix};
     use tracer::Tuple;
 
     #[test]
@@ -195,4 +195,47 @@ mod tests {
         assert_eq!(identity, output)
     }
 
+    #[test]
+    fn test_determinant_2x2() {
+        let a = Matrix::new(vec![
+            vec![1., 5.],
+            vec![-3., 2.],
+        ]);
+
+        let det = determinant(a);
+        assert_eq!(17., det)
+    }
+
+    #[test]
+    fn test_submatrix() {
+        let a = Matrix::new(vec![
+            vec![1., 5., 0.],
+            vec![-3., 2., 7.],
+            vec![0., 6., -3.],
+        ]);
+        let output = submatrix(a, 0, 2);
+        let expected = Matrix::new(vec![
+            vec![-3., 2.],
+            vec![0., 6.],
+        ]);
+        assert_eq!(expected, output)
+    }
+
+    #[test]
+    fn test_submatrix_4x4() {
+        let a = Matrix::new(vec![
+            vec![-6., 1., 1., 6.],
+            vec![-8., 5., 8., 6.],
+            vec![-1., 0., 8., 2.],
+            vec![-7., 1., -1., 1.],
+        ]);
+        let output = submatrix(a, 2, 1);
+        let expected = Matrix::new(vec![
+            vec![-6., 1., 6.],
+            vec![-8., 8., 6.],
+            vec![-7., -1., 1.],
+        ]);
+
+        assert_eq!(expected, output)
+    }
 }

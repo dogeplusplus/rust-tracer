@@ -110,3 +110,23 @@ impl Mul<Tuple> for Matrix {
         result
     }
 }
+
+pub fn determinant(m: Matrix) -> f32 {
+    m[0][0] * m[1][1] - m[0][1] * m[1][0]
+}
+
+pub fn submatrix(m: Matrix, r: usize, c: usize) -> Matrix {
+    let mut sub = Vec::new();
+    for row in 0..m.rows {
+        let mut sub_row = Vec::new();
+        for col in 0..m.columns {
+            if r != row && c != col {
+                sub_row.push(m[row][col]);
+            }
+        }
+        if sub_row.len() > 0 {
+            sub.push(sub_row);
+        }
+    }
+    Matrix::new(sub)
+}
