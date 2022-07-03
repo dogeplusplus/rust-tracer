@@ -1,5 +1,6 @@
 mod tests {
     use tracer::matrix::{Matrix};
+    use tracer::Tuple;
 
     #[test]
     fn test_matrix_constructor() {
@@ -108,6 +109,40 @@ mod tests {
         let output = a * b;
 
         assert_eq!(output, expected)
+    }
+
+    #[test]
+    fn test_multiplication_scalar() {
+        let a = Matrix::new(vec![
+            vec![1., 2., 3., 4.],
+            vec![2., 4., 4., 2.],
+            vec![8., 6., 4., 1.],
+            vec![0., 0., 0., 1.],
+        ]);
+        let b = 2.;
+        let expected = Matrix::new(vec![
+            vec![2., 4., 6., 8.],
+            vec![4., 8., 8., 4.],
+            vec![16., 12., 8., 2.],
+            vec![0., 0., 0., 2.],
+        ]);
+        let output = a * b;
+        assert_eq!(output, expected);
+    }
+
+    #[test]
+    fn test_multiplication_tuple() {
+        let a = Matrix::new(vec![
+            vec![1., 2., 3., 4.],
+            vec![2., 4., 4., 2.],
+            vec![8., 6., 4., 1.],
+            vec![0., 0., 0., 1.],
+        ]);
+
+        let b = Tuple::new(1., 2., 3., 1.);
+        let expected = Tuple::new(18., 24., 33., 1.);
+
+        assert_eq!(expected, a * b);
     }
 
 }
