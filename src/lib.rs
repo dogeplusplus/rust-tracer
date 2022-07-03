@@ -4,7 +4,7 @@ use std::cmp::Eq;
 use std::ops::{Add, Sub, Neg, Mul, Div};
 
 pub mod canvas;
-
+pub mod matrix;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
