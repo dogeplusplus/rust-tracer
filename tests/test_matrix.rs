@@ -183,4 +183,16 @@ mod tests {
         assert_eq!(expected, output)
     }
 
+    #[test]
+    fn test_transpose_identity() {
+        let identity = Matrix::new(vec![
+            vec![1., 0., 0., 0.],
+            vec![0., 1., 0., 0.],
+            vec![0., 0., 1., 0.],
+            vec![0., 0., 0., 1.],
+        ]);
+        let output = identity.transpose();
+        assert_eq!(identity, output)
+    }
+
 }
