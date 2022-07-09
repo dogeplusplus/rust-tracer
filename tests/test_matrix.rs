@@ -301,6 +301,98 @@ mod tests {
         assert_eq!(a.cofactor(0, 2), 210.);
         assert_eq!(a.cofactor(0, 3), 51.);
         assert_eq!(a.determinant(), -4071.);
+    }
+
+    #[test]
+    fn test_invertible() {
+        let a = Matrix::new([
+            [6., 4., 4., 4.],
+            [5., 5., 7., 6.],
+            [4., -9., 3., -7.],
+            [9., 1., 7., -6.],
+        ]);
+        assert_eq!(a.determinant(), -2120.);
+        assert!(a.invertible())
+    }
+
+    #[test]
+    fn test_non_invertible() {
+        let a = Matrix::new([
+            [-4., 2., -2., -3.],
+            [9., 6., 2., 6.],
+            [0., -5., 1., -5.],
+            [0., 0., 0., 0.],
+        ]);
+
+        assert_eq!(a.determinant(), 0.);
+        assert!(!a.invertible())
+    }
+
+    #[test]
+    fn test_inverse() -> Result<(), &'static str> {
+        let a = Matrix::new([
+            [-5., 2., 6., -8.],
+            [1., -5., 1., 8.],
+            [7., 7., -6., -7.],
+            [1., -3., 7., 4.],
+        ]);
+
+        let b = a.inverse()?;
+
+        assert_eq!(a.determinant(), 532.);
+        assert_eq!(a.cofactor(2, 3), -160.);
+        assert_eq!(b[3][2], -160./ 532.);
+        assert_eq!(a.cofactor(3, 2), 105.);
+        assert_eq!(b[2][3], 105. / 532.);
+
+        let expected = Matrix::new([
+            [116., 240., 128., -24.],
+            [-430., -775., -236., 277.],
+            [-42., -119., -28., 105.],
+            [-278., -433., -160., 163.],            
+        ]) / 532.;
+
+        assert_eq!(b, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn test_inverse_2() -> Result<(), &'static str> {
+        let a = Matrix::new([
+            [9., 3., 0., 9.],
+            [-5., -2., -6., -3.],
+            [-4., 9., 6., 4.],
+            [-7., 6., 6., 2.],
+        ]);
         
+        let b = a.inverse()?;
+        let expected = Matrix::new([
+            [ -66., -126.,  234., -360.],
+            [-126.,   54.,  594., -540.],
+            [ -47., -237., -177.,  210.],
+            [ 288.,  108., -432.,  540.],
+        ]) / 1620.;
+        assert_eq!(b, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn test_inverse_3() -> Result<(), &'static str> {
+        let a = Matrix::new([
+            [8., -5., 9., 2.],
+            [7., 5., 6., 1.],
+            [-6., 0., 9., 6.],
+            [-3., 0., -9., -4.],
+        ]);
+
+        let b = a.inverse()?;
+        let expected = Matrix::new([
+            [  90.,   90.,  165.,  315.],
+            [  45.,  -72.,  -15.,  -18.],
+            [-210., -210., -255., -540.],
+            [ 405.,  405.,  450., 1125.],
+        ]) / -585.;
+        assert_eq!(b, expected);
+        Ok(())
     }
 }

@@ -1,6 +1,6 @@
 use crate::Tuple;
 use num_traits::Num;
-use std::ops::{AddAssign, Index, Mul};
+use std::ops::{AddAssign, Index, Mul, Div};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Matrix<T, const Y: usize, const X: usize> {
@@ -69,6 +69,21 @@ impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Mul<T>
     }
 }
 
+impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Div<T>
+    for Matrix<T, Y, X>
+{
+    type Output = Matrix<T, Y, X>;
+    fn div(self, rhs: T) -> Self::Output {
+        let t = T::default();
+        let mut product = [[t; X]; Y];
+        for y in 0..Y {
+            for x in 0..X {
+                product[y][x] = self[y][x] / rhs;
+            }
+        }
+        Matrix{ mat: product }
+    }
+}
 
 impl Mul<Tuple> for Matrix<f32, 4, 4> {
     type Output = Tuple;
@@ -125,6 +140,27 @@ impl Matrix<f32, 4, 4> {
         }
         det
     }
+
+    pub fn invertible(self) -> bool {
+        self.determinant() != 0.
+    }
+
+    pub fn inverse(self) -> Result<Self, &'static str> {
+        if !self.invertible() {
+            return Err("Cannot be inverted. Determinant 0");
+        }
+
+        let det = self.determinant();
+        let mut inverse = [[0.; 4]; 4];
+
+        for r in 0..4 {
+            for c in 0..4 {
+                let cof = self.cofactor(r, c);
+                inverse[c][r] = cof / det;
+            }
+        }
+        Ok(Self::new(inverse))
+    }
 }
 
 impl Matrix<f32, 3, 3> {
@@ -168,10 +204,17 @@ impl Matrix<f32, 3, 3> {
         det
     }
 
+    pub fn invertible(self) -> bool {
+        self.determinant() != 0.
+    }
 }
 
 impl Matrix<f32, 2, 2> {
     pub fn determinant(self) -> f32 {
         self[0][0] * self[1][1] - self[0][1] * self[1][0]
+    }
+    
+    pub fn invertible(self) -> bool {
+        self.determinant() != 0.
     }
 }
