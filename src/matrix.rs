@@ -104,6 +104,27 @@ impl Matrix<f32, 4, 4> {
         }
         Matrix { mat: sub }
     }
+
+    pub fn minor(self, r: usize, c: usize) -> f32 {
+        self.submatrix(r, c).determinant()
+    }
+    
+    pub fn cofactor(self, r: usize, c: usize) -> f32 {
+        let pow = (r + c) % 2;
+        if pow == 0 {
+            self.minor(r, c)
+        } else {
+            -self.minor(r, c)
+        }
+    }
+
+    pub fn determinant(self) -> f32 {
+        let mut det = 0.;
+        for r in 0..4 {
+            det += self[r][0] * self.cofactor(r, 0);
+        }
+        det
+    }
 }
 
 impl Matrix<f32, 3, 3> {
@@ -133,18 +154,16 @@ impl Matrix<f32, 3, 3> {
     pub fn cofactor(self, r: usize, c: usize) -> f32 {
         let pow = (r + c) % 2;
         if pow == 0 {
-            self.submatrix(r, c).determinant()
+            self.minor(r, c)
         } else {
-            -self.submatrix(r, c).determinant()
+            -self.minor(r, c)
         }
     }
 
     pub fn determinant(self) -> f32 {
         let mut det = 0.;
         for r in 0..3 {
-            for c in 0..3 {
-                det += self.cofactor(r, c);
-            }
+            det += self[r][0] * self.cofactor(r, 0);
         }
         det
     }

@@ -272,4 +272,35 @@ mod tests {
         assert_eq!(min_2, 25.);
         assert_eq!(cof_2, -25.);
     }
+
+    #[test]
+    fn test_determinant_3x3() {
+        let a = Matrix::new([
+            [1., 2., 6.],
+            [-5., 8., -4.],
+            [2., 6., 4.],
+        ]);
+
+        assert_eq!(a.cofactor(0, 0), 56.);
+        assert_eq!(a.cofactor(0, 1), 12.);
+        assert_eq!(a.cofactor(0, 2), -46.);
+        assert_eq!(a.determinant(), -196.);
+    }
+
+    #[test]
+    fn test_determinant_4x4() {
+        let a = Matrix::new([
+            [-2., -8., 3., 5.],
+            [-3., 1., 7., 3.],
+            [1., 2., -9., 6.],
+            [-6., 7., 7., -9.],
+        ]);
+
+        assert_eq!(a.cofactor(0, 0), 690.);
+        assert_eq!(a.cofactor(0, 1), 447.);
+        assert_eq!(a.cofactor(0, 2), 210.);
+        assert_eq!(a.cofactor(0, 3), 51.);
+        assert_eq!(a.determinant(), -4071.);
+        
+    }
 }
