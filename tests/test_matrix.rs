@@ -395,4 +395,39 @@ mod tests {
         assert_eq!(b, expected);
         Ok(())
     }
+
+    #[test]
+    fn test_invert_multiplication() -> Result<(), &'static str> {
+        let a = Matrix::new([
+            [3., -9., 7., 3.],
+            [3., -8., 2., -9.],
+            [-4., 4., 4., 1.],
+            [-6., 5., -1., 1.],
+        ]);
+        let b = Matrix::new([
+            [8., 2., 2., 2.],
+            [3., -1., 7., 0.],
+            [7., 0., 5., 4.],
+            [6., -2., 0., 5.],
+        ]);
+        
+        let c = a * b;
+        let diff = c * b.inverse()? - a;
+        assert!(diff.norm() < 1e-5);
+        Ok(())
+    }
+
+    #[test]
+    fn test_norm() {
+        let a = Matrix::new([
+            [3., -9., 7., 3.],
+            [3., -8., 2., -9.],
+            [-4., 4., 4., 1.],
+            [-6., 5., -1., 1.],
+        ]);
+        let norm = a.norm();
+        let expected = 20.445048300260872;
+
+        assert_eq!(norm, expected)
+    }
 }

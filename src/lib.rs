@@ -5,6 +5,7 @@ use std::ops::{Add, Sub, Neg, Mul, Div};
 
 pub mod canvas;
 pub mod matrix;
+pub mod transforms;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

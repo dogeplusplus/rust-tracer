@@ -1,13 +1,13 @@
 use crate::Tuple;
-use num_traits::Num;
-use std::ops::{AddAssign, Index, Mul, Div};
+use num_traits::{Num, Float};
+use std::ops::{AddAssign, Index, Mul, Div, Add, Sub};
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Matrix<T, const Y: usize, const X: usize> {
     pub mat: [[T; X]; Y],
 }
 
-impl<T: Num + AddAssign + Default + Copy, const Y: usize, const X: usize> Matrix<T, Y, X> {
+impl<T: Num + AddAssign + Default + Copy + Float, const Y: usize, const X: usize> Matrix<T, Y, X> {
     pub fn new(mat: [[T; X]; Y]) -> Self {
         Matrix { mat }
     }
@@ -24,6 +24,17 @@ impl<T: Num + AddAssign + Default + Copy, const Y: usize, const X: usize> Matrix
 
         Matrix { mat: transposed }
     }
+
+    pub fn norm(&self) -> T {
+        let mut euclidean_norm = T::default();
+        for y in 0..Y {
+            for x in 0..X {
+                euclidean_norm += self[y][x] * self[y][x];
+            }
+        }
+
+        euclidean_norm.sqrt()
+    }
 }
 
 impl<T, const Y: usize, const X: usize> Index<usize> for Matrix<T, Y, X> {
@@ -34,13 +45,43 @@ impl<T, const Y: usize, const X: usize> Index<usize> for Matrix<T, Y, X> {
     }
 }
 
+impl <T: Num + Copy + Default, const Y: usize, const X: usize> Add<Matrix<T, Y, X>> for Matrix<T, Y, X> {
+    type Output = Matrix<T, Y, X>;
+
+    fn add(self, rhs: Matrix<T, Y, X>) -> Self::Output {
+        let t = T::default();
+        let mut result = [[t; X]; Y];
+        for y in 0..Y {
+            for x in 0..X {
+                result[y][x] = self[y][x] + rhs[y][x];
+            }
+        }
+        Matrix{ mat: result }
+    }
+}
+
+impl <T: Num + Copy + Default, const Y: usize, const X: usize> Sub<Matrix<T, Y, X>> for Matrix<T, Y, X> {
+    type Output = Matrix<T, Y, X>;
+
+    fn sub(self, rhs: Matrix<T, Y, X>) -> Self::Output {
+        let t = T::default();
+        let mut result = [[t; X]; Y];
+        for y in 0..Y {
+            for x in 0..X {
+                result[y][x] = self[y][x] - rhs[y][x];
+            }
+        }
+        Matrix{ mat: result }
+    }
+}
+
 impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize, const M: usize>
     Mul<Matrix<T, M, X>> for Matrix<T, Y, M>
 {
     type Output = Matrix<T, Y, X>;
     
     fn mul(self, rhs: Matrix<T, M, X>) -> Self::Output {
-    let t = T::default();
+        let t = T::default();
         let mut result = [[t; X]; Y];
         for y in 0..Y {
             for x in 0..X {
@@ -94,8 +135,7 @@ impl Mul<Tuple> for Matrix<f32, 4, 4> {
         let z = self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z + self[2][3] * rhs.w;
         let w = self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * rhs.w;
 
-        let result = Tuple::new(x, y, z, w);
-        result
+        Tuple::new(x, y, z, w)
     }
 }
 
