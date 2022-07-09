@@ -1,132 +1,158 @@
-use std::ops::{Index, Mul};
 use crate::Tuple;
+use num_traits::Num;
+use std::ops::{AddAssign, Index, Mul};
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Matrix {
-    pub mat: Vec<Vec<f32>>,
-    pub rows: usize,
-    pub columns: usize,
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct Matrix<T, const Y: usize, const X: usize> {
+    pub mat: [[T; X]; Y],
 }
 
-impl Matrix {
-    pub fn new(mat: Vec<Vec<f32>>) -> Self {
-        let rows = mat.len();
-        let columns = mat[0].len();
-        Matrix { mat, rows, columns }
+impl<T: Num + AddAssign + Default + Copy, const Y: usize, const X: usize> Matrix<T, Y, X> {
+    pub fn new(mat: [[T; X]; Y]) -> Self {
+        Matrix { mat }
     }
 
-    pub fn transpose(&self) -> Self {
-        let rows = self.columns;
-        let columns = self.rows;
+    pub fn transpose(&self) -> Matrix<T, X, Y> {
+        let t = T::default();
+        let mut transposed = [[t; Y]; X];
 
-        let mut mat = Vec::new();
-        for r in 0..rows {
-            let mut transposed_row = Vec::new(); 
-            for c in 0..columns {
-                transposed_row.push(self[c][r]);
+        for y in 0..Y {
+            for x in 0..X {
+                transposed[y][x] = self[x][y];
             }
-            mat.push(transposed_row);
         }
 
-        Matrix { mat, rows, columns }
+        Matrix { mat: transposed }
     }
 }
 
-impl Index<usize> for Matrix {
-    type Output = Vec<f32>;
+impl<T, const Y: usize, const X: usize> Index<usize> for Matrix<T, Y, X> {
+    type Output = [T; X];
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.mat[index]
     }
 }
 
-impl Mul for Matrix {
-    type Output = Matrix;
+impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize, const M: usize>
+    Mul<Matrix<T, M, X>> for Matrix<T, Y, M>
+{
+    type Output = Matrix<T, Y, X>;
     
-    fn mul(self, rhs: Self) -> Self::Output {
-        assert_eq!(self.columns, rhs.rows);
-
-        let mut product = Vec::new();
-        let mid = self.columns;
-
-        for r in 0..self.columns {
-            let mut product_row = Vec::new();
-            for c in 0..rhs.rows {
-                let mut entry = 0.;
-                for n in 0..mid {
-                    entry += self[r][n] * rhs[n][c];
-                }
-                product_row.push(entry);
+    fn mul(self, rhs: Matrix<T, M, X>) -> Self::Output {
+    let t = T::default();
+        let mut result = [[t; X]; Y];
+        for y in 0..Y {
+            for x in 0..X {
+                for m in 0..M {
+                    result[y][x] += self[y][m] * rhs[m][x]
+                } 
             }
-            product.push(product_row);
         }
-
-        Matrix::new(product)
+        Matrix{ mat: result }
     }
-}
+} 
 
-impl Mul<f32> for Matrix {
-    type Output = Matrix;
-    fn mul(self, rhs: f32) -> Self::Output {
-        let mut product = Vec::new();
-
-        for r in 0..self.rows {
-            let mut product_row = Vec::new();
-            for c in 0..self.columns {
-                product_row.push(self[r][c] * rhs);
+impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Mul<T>
+    for Matrix<T, Y, X>
+{
+    type Output = Matrix<T, Y, X>;
+    fn mul(self, rhs: T) -> Self::Output {
+        let t = T::default();
+        let mut product = [[t; X]; Y];
+        for y in 0..Y {
+            for x in 0..X {
+                product[y][x] = self[y][x] * rhs;
             }
-            product.push(product_row);
         }
-        Matrix::new(product)
+        Matrix{ mat: product }
     }
 }
 
-impl Mul<Matrix> for f32 {
-    type Output = Matrix;
-    
-    fn mul(self, rhs: Matrix) -> Self::Output {
-        rhs * self
-    }
-}
 
-impl Mul<Tuple> for Matrix {
+impl Mul<Tuple> for Matrix<f32, 4, 4> {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Self::Output {
-        let vec = Matrix::new(vec![
-            vec![rhs.x],
-            vec![rhs.y],
-            vec![rhs.z],
-            vec![rhs.w],
-        ]);
+        let x = self[0][0] * rhs.x + self[0][1] * rhs.y + self[0][2] * rhs.z + self[0][3] * rhs.w;
+        let y = self[1][0] * rhs.x + self[1][1] * rhs.y + self[1][2] * rhs.z + self[1][3] * rhs.w;
+        let z = self[2][0] * rhs.x + self[2][1] * rhs.y + self[2][2] * rhs.z + self[2][3] * rhs.w;
+        let w = self[3][0] * rhs.x + self[3][1] * rhs.y + self[3][2] * rhs.z + self[3][3] * rhs.w;
 
-        let matrix_prod = self * vec;
-        let result = Tuple::new(
-            matrix_prod[0][0],
-            matrix_prod[1][0],
-            matrix_prod[2][0],
-            matrix_prod[3][0],
-        );
+        let result = Tuple::new(x, y, z, w);
         result
     }
 }
 
-pub fn determinant(m: Matrix) -> f32 {
-    m[0][0] * m[1][1] - m[0][1] * m[1][0]
-}
 
-pub fn submatrix(m: Matrix, r: usize, c: usize) -> Matrix {
-    let mut sub = Vec::new();
-    for row in 0..m.rows {
-        let mut sub_row = Vec::new();
-        for col in 0..m.columns {
-            if r != row && c != col {
-                sub_row.push(m[row][col]);
+impl Matrix<f32, 4, 4> {
+    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 3, 3>  {
+        let mut sub = [[0.0; 3]; 3];
+
+        for y in 0..3 {
+            for x in 0..3 {
+                let skipped_col = y >= r;
+                let skipped_row = x >= c;
+
+                sub[y][x] = match (skipped_col, skipped_row) {
+                    (false, false) => self[y][x],
+                    (true, false) => self[y + 1][x],
+                    (false, true) => self[y][x + 1],
+                    (true, true) => self[y + 1][x + 1],
+                };
             }
         }
-        if sub_row.len() > 0 {
-            sub.push(sub_row);
+        Matrix { mat: sub }
+    }
+}
+
+impl Matrix<f32, 3, 3> {
+    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 2, 2>  {
+        let mut sub = [[0.0; 2]; 2];
+
+        for y in 0..2 {
+            for x in 0..2 {
+                let skipped_col = y >= r;
+                let skipped_row = x >= c;
+
+                sub[y][x] = match (skipped_col, skipped_row) {
+                    (false, false) => self[y][x],
+                    (true, false) => self[y + 1][x],
+                    (false, true) => self[y][x + 1],
+                    (true, true) => self[y + 1][x + 1],
+                };
+            }
+        }
+        Matrix { mat: sub }
+    }
+
+    pub fn minor(self, r: usize, c: usize) -> f32 {
+        self.submatrix(r, c).determinant()
+    }
+
+    pub fn cofactor(self, r: usize, c: usize) -> f32 {
+        let pow = (r + c) % 2;
+        if pow == 0 {
+            self.submatrix(r, c).determinant()
+        } else {
+            -self.submatrix(r, c).determinant()
         }
     }
-    Matrix::new(sub)
+
+    pub fn determinant(self) -> f32 {
+        let mut det = 0.;
+        for r in 0..3 {
+            for c in 0..3 {
+                det += self.cofactor(r, c);
+            }
+        }
+        det
+    }
+
+}
+
+impl Matrix<f32, 2, 2> {
+    pub fn determinant(self) -> f32 {
+        self[0][0] * self[1][1] - self[0][1] * self[1][0]
+    }
 }
