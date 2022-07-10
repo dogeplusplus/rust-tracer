@@ -50,3 +50,13 @@ pub fn rotation_z(r: f32) -> Matrix<f32, 4, 4> {
     ]);
     rot_matrix_z
 }
+
+pub fn shearing(xy: f32, xz: f32, yx: f32, yz: f32, zx: f32, zy: f32) -> Matrix<f32, 4, 4> {
+    let shear = Matrix::new([
+        [1., xy, xz, 0.],
+        [yx, 1., yz, 0.],
+        [zx, zy, 1., 0.],
+        [0., 0., 0., 1.],
+    ]);
+    shear
+}

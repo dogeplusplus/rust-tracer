@@ -1,7 +1,7 @@
 mod tests {
     use std::f32::consts::PI;
     use tracer::{point, vector, magnitude};
-    use tracer::transforms::{translation, scaling, rotation_x, rotation_y, rotation_z};
+    use tracer::transforms::{translation, scaling, rotation_x, rotation_y, rotation_z, shearing};
 
     #[test]
     fn test_translation() {
@@ -110,5 +110,53 @@ mod tests {
         let diff_full = full_quarter * p - expected_full;
         assert!(magnitude(diff_half) < 1e-5);
         assert!(magnitude(diff_full) < 1e-5);
+    }
+
+    #[test]
+    fn test_shearing() {
+        let transform = shearing(1., 0., 0., 0., 0., 0.);
+        let p = point(2., 3., 4.);
+        let expected = point(5., 3., 4.);
+        assert_eq!(transform * p, expected)
+    }
+
+    #[test]
+    fn test_shearing_xz() {
+        let transform = shearing(0., 1., 0., 0., 0., 0.);
+        let p = point(2., 3., 4.);
+        let expected = point(6., 3., 4.);
+        assert_eq!(transform * p, expected)
+    }
+
+    #[test]
+    fn test_shearing_yx() {
+        let transform = shearing(0., 0., 1., 0., 0., 0.);
+        let p = point(2., 3., 4.);
+        let expected = point(2., 5., 4.);
+        assert_eq!(transform * p, expected)
+    }
+
+    #[test]
+    fn test_shearing_yz() {
+        let transform = shearing(0., 0., 0., 1., 0., 0.);
+        let p = point(2., 3., 4.);
+        let expected = point(2., 7., 4.);
+        assert_eq!(transform * p, expected)
+    }
+
+    #[test]
+    fn test_shearing_zx() {
+        let transform = shearing(0., 0., 0., 0., 1., 0.);
+        let p = point(2., 3., 4.);
+        let expected = point(2., 3., 6.);
+        assert_eq!(transform * p, expected)
+    }
+
+    #[test]
+    fn test_shearing_zy() {
+        let transform = shearing(0., 0., 0., 0., 0., 1.);
+        let p = point(2., 3., 4.);
+        let expected = point(2., 3., 7.);
+        assert_eq!(transform * p, expected)
     }
 }
