@@ -159,4 +159,35 @@ mod tests {
         let expected = point(2., 3., 7.);
         assert_eq!(transform * p, expected)
     }
+
+    #[test]
+    fn test_composition() {
+        let p = point(1., 0., 1.);
+        let a = rotation_x(PI / 2.);
+        let b = scaling(5., 5., 5.);
+        let c = translation(10., 5., 7.);
+
+        let p2 = a * p;
+        
+        let diff = p2 - point(1., -1., 0.);
+        assert!(magnitude(diff) < 1e-5);
+
+        let p3 = b * p2;
+        let diff = p3 - point(5., -5., 0.);
+        assert!(magnitude(diff) < 1e-5);
+
+        let p4 = c * p3;
+        let diff = p4 - point(15., 0., 7.);
+        assert!(magnitude(diff) < 1e-5);
+    }
+
+    #[test]
+    fn test_composition_reverse() {
+        let p = point(1., 0., 1.);
+        let a = rotation_x(PI / 2.);
+        let b = scaling(5., 5., 5.);
+        let c = translation(10., 5., 7.);
+        let t = c * b * a;
+        assert_eq!(t * p, point(15., 0., 7.))
+    }
 }
