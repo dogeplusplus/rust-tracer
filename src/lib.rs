@@ -3,6 +3,7 @@ use std::fmt::Display;
 use std::cmp::Eq;
 use std::ops::{Add, Sub, Neg, Mul, Div};
 
+pub mod sphere;
 pub mod ray;
 pub mod canvas;
 pub mod matrix;
