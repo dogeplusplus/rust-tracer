@@ -3,11 +3,12 @@ use std::fmt::Display;
 use std::cmp::Eq;
 use std::ops::{Add, Sub, Neg, Mul, Div};
 
-pub mod sphere;
-pub mod ray;
 pub mod canvas;
 pub mod matrix;
 pub mod transforms;
+pub mod ray;
+pub mod sphere;
+pub mod intersections;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

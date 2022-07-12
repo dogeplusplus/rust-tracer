@@ -1,7 +1,9 @@
+use crate::intersections::Intersection;
 use crate::{Tuple,dot,point};
 use crate::ray::Ray;
 
 
+#[derive(Debug,PartialEq,Clone,Copy)]
 pub struct Sphere {
     pub center: Tuple,
     pub radius: f32,
@@ -13,7 +15,7 @@ impl Sphere {
     }
 }
 
-pub fn intersect(_: Sphere, ray: Ray) -> Vec<f32> {
+pub fn intersect(sphere: Sphere, ray: Ray) -> Vec<Intersection> {
     let sphere_to_ray = ray.origin - point(0., 0., 0.);
     let a = dot(ray.direction, ray.direction);
     let b = 2. * dot(ray.direction, sphere_to_ray);
@@ -26,6 +28,6 @@ pub fn intersect(_: Sphere, ray: Ray) -> Vec<f32> {
     } else {
         let t1 = (-b - f32::sqrt(discriminant)) / (2. * a);
         let t2 = (-b + f32::sqrt(discriminant)) / (2. * a);
-        vec![t1, t2]
+        vec![Intersection::new(t1, sphere), Intersection::new(t2, sphere)]
     }
 }
