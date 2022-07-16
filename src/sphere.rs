@@ -1,7 +1,7 @@
 use crate::intersections::Intersection;
 use crate::matrix::Matrix;
 use crate::ray::{transform, Ray};
-use crate::{dot, point, Tuple};
+use crate::{dot, normalize, point, Tuple};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Sphere {
@@ -46,4 +46,14 @@ pub fn intersect(sphere: Sphere, ray: Ray) -> Vec<Intersection> {
 
 pub fn set_transform(sphere: &mut Sphere, transform: Matrix<f32, 4, 4>) {
     sphere.transform = transform;
+}
+
+pub fn normal_at(s: Sphere, world_point: Tuple) -> Tuple {
+    let inverse = s.transform.inverse().unwrap();
+    let object_point = inverse * world_point;
+    let object_normal = object_point - point(0., 0., 0.);
+    let mut world_normal = inverse.transpose() * object_normal;
+    world_normal.w = 0.0;
+
+    normalize(world_normal)
 }

@@ -1,9 +1,11 @@
 mod tests {
+    use std::f32::consts::PI;
+
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
     use tracer::sphere::{intersect, normal_at, set_transform, Sphere};
-    use tracer::transforms::{scaling, translation};
-    use tracer::{point, vector};
+    use tracer::transforms::{rotation_z, scaling, translation};
+    use tracer::{magnitude, normalize, point, vector};
 
     #[test]
     fn test_ray_intersect_sphere() {
@@ -107,5 +109,49 @@ mod tests {
         let s = Sphere::new();
         let n = normal_at(s, point(0., 1., 0.));
         assert_eq!(n, vector(0., 1., 0.));
+    }
+
+    #[test]
+    fn test_normal_z() {
+        let s = Sphere::new();
+        let n = normal_at(s, point(0., 0., 1.));
+        assert_eq!(n, vector(0., 0., 1.));
+    }
+
+    #[test]
+    fn test_normal_non_axial() {
+        let s = Sphere::new();
+        let x = f32::sqrt(3.) / 3.;
+        let n = normal_at(s, point(x, x, x));
+        let diff = n - vector(x, x, x);
+        assert!(magnitude(diff) < 1e-5);
+    }
+
+    #[test]
+    fn test_normal_unit_vector() {
+        let s = Sphere::new();
+        let x = f32::sqrt(3.) / 3.;
+        let n = normal_at(s, point(x, x, x));
+        let diff = n - normalize(n);
+        assert!(magnitude(diff) < 1e-5);
+    }
+
+    #[test]
+    fn test_normal_translated_sphere() {
+        let mut s = Sphere::new();
+        set_transform(&mut s, translation(0., 1., 0.));
+        let n = normal_at(s, point(0., 1.70711, -0.70711));
+        let diff = n - vector(0., 0.70711, -0.70711);
+        assert!(magnitude(diff) < 1e-5);
+    }
+
+    #[test]
+    fn test_normal_transformed_sphere() {
+        let mut s = Sphere::new();
+        let m = scaling(1., 0.5, 1.) * rotation_z(PI / 5.);
+        set_transform(&mut s, m);
+        let n = normal_at(s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
+        let diff = n - vector(0., 0.97014, -0.24254);
+        assert!(magnitude(diff) < 1e-5);
     }
 }
