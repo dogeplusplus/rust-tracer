@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_normal_y() {
-        s = Sphere::new();
+        let s = Sphere::new();
         let n = normal_at(s, point(0., 1., 0.));
         assert_eq!(n, vector(0., 1., 0.));
     }
