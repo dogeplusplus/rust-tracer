@@ -1,6 +1,6 @@
 use crate::Tuple;
-use num_traits::{Num, Float};
-use std::ops::{AddAssign, Index, Mul, Div, Add, Sub};
+use num_traits::{Float, Num};
+use std::ops::{Add, AddAssign, Div, Index, Mul, Sub};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Matrix<T, const Y: usize, const X: usize> {
@@ -45,7 +45,9 @@ impl<T, const Y: usize, const X: usize> Index<usize> for Matrix<T, Y, X> {
     }
 }
 
-impl <T: Num + Copy + Default, const Y: usize, const X: usize> Add<Matrix<T, Y, X>> for Matrix<T, Y, X> {
+impl<T: Num + Copy + Default, const Y: usize, const X: usize> Add<Matrix<T, Y, X>>
+    for Matrix<T, Y, X>
+{
     type Output = Matrix<T, Y, X>;
 
     fn add(self, rhs: Matrix<T, Y, X>) -> Self::Output {
@@ -56,11 +58,13 @@ impl <T: Num + Copy + Default, const Y: usize, const X: usize> Add<Matrix<T, Y, 
                 result[y][x] = self[y][x] + rhs[y][x];
             }
         }
-        Matrix{ mat: result }
+        Matrix { mat: result }
     }
 }
 
-impl <T: Num + Copy + Default, const Y: usize, const X: usize> Sub<Matrix<T, Y, X>> for Matrix<T, Y, X> {
+impl<T: Num + Copy + Default, const Y: usize, const X: usize> Sub<Matrix<T, Y, X>>
+    for Matrix<T, Y, X>
+{
     type Output = Matrix<T, Y, X>;
 
     fn sub(self, rhs: Matrix<T, Y, X>) -> Self::Output {
@@ -71,7 +75,7 @@ impl <T: Num + Copy + Default, const Y: usize, const X: usize> Sub<Matrix<T, Y, 
                 result[y][x] = self[y][x] - rhs[y][x];
             }
         }
-        Matrix{ mat: result }
+        Matrix { mat: result }
     }
 }
 
@@ -79,7 +83,7 @@ impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize, const 
     Mul<Matrix<T, M, X>> for Matrix<T, Y, M>
 {
     type Output = Matrix<T, Y, X>;
-    
+
     fn mul(self, rhs: Matrix<T, M, X>) -> Self::Output {
         let t = T::default();
         let mut result = [[t; X]; Y];
@@ -87,12 +91,12 @@ impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize, const 
             for x in 0..X {
                 for m in 0..M {
                     result[y][x] += self[y][m] * rhs[m][x]
-                } 
+                }
             }
         }
-        Matrix{ mat: result }
+        Matrix { mat: result }
     }
-} 
+}
 
 impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Mul<T>
     for Matrix<T, Y, X>
@@ -106,7 +110,7 @@ impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Mul<T>
                 product[y][x] = self[y][x] * rhs;
             }
         }
-        Matrix{ mat: product }
+        Matrix { mat: product }
     }
 }
 
@@ -122,7 +126,7 @@ impl<T: Num + AddAssign + Copy + Default, const Y: usize, const X: usize> Div<T>
                 product[y][x] = self[y][x] / rhs;
             }
         }
-        Matrix{ mat: product }
+        Matrix { mat: product }
     }
 }
 
@@ -139,9 +143,8 @@ impl Mul<Tuple> for Matrix<f32, 4, 4> {
     }
 }
 
-
 impl Matrix<f32, 4, 4> {
-    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 3, 3>  {
+    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 3, 3> {
         let mut sub = [[0.0; 3]; 3];
 
         for y in 0..3 {
@@ -163,7 +166,7 @@ impl Matrix<f32, 4, 4> {
     pub fn minor(self, r: usize, c: usize) -> f32 {
         self.submatrix(r, c).determinant()
     }
-    
+
     pub fn cofactor(self, r: usize, c: usize) -> f32 {
         let pow = (r + c) % 2;
         if pow == 0 {
@@ -204,7 +207,7 @@ impl Matrix<f32, 4, 4> {
 }
 
 impl Matrix<f32, 3, 3> {
-    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 2, 2>  {
+    pub fn submatrix(self, r: usize, c: usize) -> Matrix<f32, 2, 2> {
         let mut sub = [[0.0; 2]; 2];
 
         for y in 0..2 {
@@ -253,7 +256,7 @@ impl Matrix<f32, 2, 2> {
     pub fn determinant(self) -> f32 {
         self[0][0] * self[1][1] - self[0][1] * self[1][0]
     }
-    
+
     pub fn invertible(self) -> bool {
         self.determinant() != 0.
     }

@@ -1,7 +1,7 @@
 mod tests {
-    use tracer::{point,vector};
-    use tracer::ray::{Ray,position,transform};
-    use tracer::transforms::{translation,scaling};
+    use tracer::ray::{position, transform, Ray};
+    use tracer::transforms::{scaling, translation};
+    use tracer::{point, vector};
 
     #[test]
     fn test_query_ray() {
@@ -21,7 +21,6 @@ mod tests {
         assert_eq!(position(r, 1.), point(3., 3., 4.));
         assert_eq!(position(r, -1.), point(1., 3., 4.));
         assert_eq!(position(r, 2.5), point(4.5, 3., 4.));
-        
     }
 
     #[test]
@@ -29,7 +28,7 @@ mod tests {
         let r = Ray::new(point(1., 2., 3.), vector(0., 1., 0.));
         let m = translation(3., 4., 5.);
         let r2 = transform(r, m);
-        
+
         assert_eq!(r2.origin, point(4., 6., 8.));
         assert_eq!(r2.direction, vector(0., 1., 0.));
     }
@@ -39,7 +38,7 @@ mod tests {
         let r = Ray::new(point(1., 2., 3.), vector(0., 1., 0.));
         let m = scaling(2., 3., 4.);
         let r2 = transform(r, m);
-        
+
         assert_eq!(r2.origin, point(2., 6., 12.));
         assert_eq!(r2.direction, vector(0., 3., 0.));
     }

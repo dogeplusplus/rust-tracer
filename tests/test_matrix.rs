@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::matrix::{Matrix};
+    use tracer::matrix::Matrix;
     use tracer::Tuple;
 
     #[test]
@@ -21,10 +21,7 @@ mod tests {
 
     #[test]
     fn test_matrix_construct_2x2() {
-        let m = Matrix::new([
-            [-3., 5.],
-            [1., -2.],
-        ]);
+        let m = Matrix::new([[-3., 5.], [1., -2.]]);
 
         assert_eq!(m[0][0], -3.);
         assert_eq!(m[0][1], 5.);
@@ -34,11 +31,7 @@ mod tests {
 
     #[test]
     fn test_matrix_construct_3x3() {
-        let m = Matrix::new([
-            [-3., 5., 0.],
-            [1., -2., -7.],
-            [0., 1., 1.],
-        ]);
+        let m = Matrix::new([[-3., 5., 0.], [1., -2., -7.], [0., 1., 1.]]);
 
         assert_eq!(m[0][0], -3.);
         assert_eq!(m[1][1], -2.);
@@ -72,7 +65,7 @@ mod tests {
             [9., 10., 11., 12.],
             [13., 14., 15., 16.],
         ]);
-        
+
         let b = Matrix::new([
             [1., 2., 3., 4.],
             [5., 6., 7., 8.],
@@ -82,7 +75,7 @@ mod tests {
 
         assert_ne!(a, b)
     }
-    
+
     #[test]
     fn test_matrix_multiplication() {
         let a = Matrix::new([
@@ -197,10 +190,7 @@ mod tests {
 
     #[test]
     fn test_determinant_2x2() {
-        let a = Matrix::new([
-            [1., 5.],
-            [-3., 2.],
-        ]);
+        let a = Matrix::new([[1., 5.], [-3., 2.]]);
 
         let det = a.determinant();
         assert_eq!(17., det)
@@ -208,16 +198,9 @@ mod tests {
 
     #[test]
     fn test_submatrix() {
-        let a = Matrix::new([
-            [1., 5., 0.],
-            [-3., 2., 7.],
-            [0., 6., -3.],
-        ]);
+        let a = Matrix::new([[1., 5., 0.], [-3., 2., 7.], [0., 6., -3.]]);
         let output = a.submatrix(0, 2);
-        let expected = Matrix::new([
-            [-3., 2.],
-            [0., 6.],
-        ]);
+        let expected = Matrix::new([[-3., 2.], [0., 6.]]);
         assert_eq!(expected, output)
     }
 
@@ -230,23 +213,15 @@ mod tests {
             [-7., 1., -1., 1.],
         ]);
         let output = a.submatrix(2, 1);
-        let expected = Matrix::new([
-            [-6., 1., 6.],
-            [-8., 8., 6.],
-            [-7., -1., 1.],
-        ]);
+        let expected = Matrix::new([[-6., 1., 6.], [-8., 8., 6.], [-7., -1., 1.]]);
 
         assert_eq!(expected, output)
     }
 
     #[test]
     fn test_minor() {
-        let a = Matrix::new([
-            [3., 5., 0.],
-            [2., -1., -7.],
-            [6., -1., 5.],
-        ]);
-            
+        let a = Matrix::new([[3., 5., 0.], [2., -1., -7.], [6., -1., 5.]]);
+
         let b = a.submatrix(1, 0);
         let det_b = b.determinant();
         let minor_a = a.minor(1, 0);
@@ -256,17 +231,13 @@ mod tests {
 
     #[test]
     fn test_cofactor() {
-        let a = Matrix::new([
-            [3., 5., 0.],
-            [2., -1., -7.],
-            [6., -1., 5.],
-        ]);
+        let a = Matrix::new([[3., 5., 0.], [2., -1., -7.], [6., -1., 5.]]);
 
         let min_1 = a.minor(0, 0);
         let cof_1 = a.cofactor(0, 0);
         let min_2 = a.minor(1, 0);
         let cof_2 = a.cofactor(1, 0);
-        
+
         assert_eq!(min_1, -12.);
         assert_eq!(cof_1, -12.);
         assert_eq!(min_2, 25.);
@@ -275,11 +246,7 @@ mod tests {
 
     #[test]
     fn test_determinant_3x3() {
-        let a = Matrix::new([
-            [1., 2., 6.],
-            [-5., 8., -4.],
-            [2., 6., 4.],
-        ]);
+        let a = Matrix::new([[1., 2., 6.], [-5., 8., -4.], [2., 6., 4.]]);
 
         assert_eq!(a.cofactor(0, 0), 56.);
         assert_eq!(a.cofactor(0, 1), 12.);
@@ -341,7 +308,7 @@ mod tests {
 
         assert_eq!(a.determinant(), 532.);
         assert_eq!(a.cofactor(2, 3), -160.);
-        assert_eq!(b[3][2], -160./ 532.);
+        assert_eq!(b[3][2], -160. / 532.);
         assert_eq!(a.cofactor(3, 2), 105.);
         assert_eq!(b[2][3], 105. / 532.);
 
@@ -349,7 +316,7 @@ mod tests {
             [116., 240., 128., -24.],
             [-430., -775., -236., 277.],
             [-42., -119., -28., 105.],
-            [-278., -433., -160., 163.],            
+            [-278., -433., -160., 163.],
         ]) / 532.;
 
         assert_eq!(b, expected);
@@ -364,13 +331,13 @@ mod tests {
             [-4., 9., 6., 4.],
             [-7., 6., 6., 2.],
         ]);
-        
+
         let b = a.inverse()?;
         let expected = Matrix::new([
-            [ -66., -126.,  234., -360.],
-            [-126.,   54.,  594., -540.],
-            [ -47., -237., -177.,  210.],
-            [ 288.,  108., -432.,  540.],
+            [-66., -126., 234., -360.],
+            [-126., 54., 594., -540.],
+            [-47., -237., -177., 210.],
+            [288., 108., -432., 540.],
         ]) / 1620.;
         assert_eq!(b, expected);
         Ok(())
@@ -387,10 +354,10 @@ mod tests {
 
         let b = a.inverse()?;
         let expected = Matrix::new([
-            [  90.,   90.,  165.,  315.],
-            [  45.,  -72.,  -15.,  -18.],
+            [90., 90., 165., 315.],
+            [45., -72., -15., -18.],
             [-210., -210., -255., -540.],
-            [ 405.,  405.,  450., 1125.],
+            [405., 405., 450., 1125.],
         ]) / -585.;
         assert_eq!(b, expected);
         Ok(())
@@ -410,7 +377,7 @@ mod tests {
             [7., 0., 5., 4.],
             [6., -2., 0., 5.],
         ]);
-        
+
         let c = a * b;
         let diff = c * b.inverse()? - a;
         assert!(diff.norm() < 1e-5);

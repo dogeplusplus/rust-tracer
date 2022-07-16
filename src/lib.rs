@@ -1,14 +1,14 @@
+use std::cmp::Eq;
 use std::fmt;
 use std::fmt::Display;
-use std::cmp::Eq;
-use std::ops::{Add, Sub, Neg, Mul, Div};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub mod canvas;
+pub mod intersections;
 pub mod matrix;
-pub mod transforms;
 pub mod ray;
 pub mod sphere;
-pub mod intersections;
+pub mod transforms;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
@@ -20,7 +20,11 @@ pub struct Tuple {
 
 impl Display for Tuple {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "x: {}, y: {}, z: {}, w: {}", self.x, self.y, self.z, self.w)
+        write!(
+            f,
+            "x: {}, y: {}, z: {}, w: {}",
+            self.x, self.y, self.z, self.w
+        )
     }
 }
 
@@ -46,7 +50,7 @@ pub struct Vector {
 
 impl Vector {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
-        Self {x, y, z}
+        Self { x, y, z }
     }
 }
 
@@ -87,7 +91,12 @@ impl Neg for Tuple {
     type Output = Self;
 
     fn neg(self) -> Self {
-        Self { x: -self.x, y: -self.y, z: -self.z, w: -self.w }
+        Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+            w: -self.w,
+        }
     }
 }
 
@@ -128,7 +137,11 @@ pub fn dot(a: Tuple, b: Tuple) -> f32 {
 }
 
 pub fn cross(a: Tuple, b: Tuple) -> Tuple {
-    vector(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x)
+    vector(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x,
+    )
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -146,7 +159,7 @@ pub struct Environment {
 pub fn tick(env: Environment, proj: Projectile) -> Projectile {
     let position = proj.position + proj.velocity;
     let velocity = proj.velocity + env.gravity + env.wind;
-    Projectile{position, velocity}
+    Projectile { position, velocity }
 }
 
 #[derive(Debug, PartialOrd, Clone, Copy)]
@@ -158,7 +171,7 @@ pub struct Color {
 
 impl Add for Color {
     type Output = Self;
-    
+
     fn add(self, rhs: Self) -> Self {
         Color {
             red: self.red + rhs.red,
@@ -170,7 +183,7 @@ impl Add for Color {
 
 impl Sub for Color {
     type Output = Self;
-    
+
     fn sub(self, rhs: Self) -> Self {
         Color {
             red: self.red - rhs.red,
@@ -182,7 +195,7 @@ impl Sub for Color {
 
 impl Mul for Color {
     type Output = Self;
-    
+
     fn mul(self, rhs: Self) -> Self {
         Color {
             red: self.red * rhs.red,
@@ -194,7 +207,7 @@ impl Mul for Color {
 
 impl Mul<f32> for Color {
     type Output = Self;
-    
+
     fn mul(self, rhs: f32) -> Self {
         Color {
             red: self.red * rhs,
@@ -207,9 +220,9 @@ impl Mul<f32> for Color {
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
         let eps = 1e-5;
-        (self.red - other.red).abs() < eps  &&
-        (self.green - other.green).abs() < eps &&
-        (self.blue - other.blue).abs() < eps 
+        (self.red - other.red).abs() < eps
+            && (self.green - other.green).abs() < eps
+            && (self.blue - other.blue).abs() < eps
     }
 }
 

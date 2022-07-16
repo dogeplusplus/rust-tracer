@@ -1,6 +1,6 @@
-use crate::{Tuple, matrix::Matrix};
+use crate::{matrix::Matrix, Tuple};
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Tuple,
     pub direction: Tuple,

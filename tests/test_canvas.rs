@@ -1,6 +1,6 @@
 mod tests {
-    use tracer::{Color};
-    use tracer::canvas::{Canvas, write_pixel, pixel_at, canvas_to_ppm};
+    use tracer::canvas::{canvas_to_ppm, pixel_at, write_pixel, Canvas};
+    use tracer::Color;
 
     #[test]
     fn test_canvas() {
@@ -20,7 +20,11 @@ mod tests {
     #[test]
     fn test_write_pixel() {
         let mut c = Canvas::new(10, 20);
-        let red = Color{red: 1.0, green: 0.0, blue: 0.0};
+        let red = Color {
+            red: 1.0,
+            green: 0.0,
+            blue: 0.0,
+        };
 
         write_pixel(&mut c, 2, 3, red);
         assert_eq!(pixel_at(&c, 2, 3), red)
@@ -30,11 +34,7 @@ mod tests {
     fn test_canvas_to_ppm_header() {
         let c = Canvas::new(5, 3);
         let ppm = canvas_to_ppm(&c);
-        let expected = vec![
-            String::from("P3"),
-            String::from("5 3"),
-            String::from("255"),
-        ];
+        let expected = vec![String::from("P3"), String::from("5 3"), String::from("255")];
 
         assert_eq!(ppm[0..3], expected)
     }
@@ -54,7 +54,7 @@ mod tests {
             String::from("0 0 0 0 0 0 0 127 0 0 0 0 0 0 0"),
             String::from("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"),
         ];
-        
+
         let ppm = canvas_to_ppm(&c);
         assert_eq!(ppm[3..6], expected)
     }
@@ -78,5 +78,4 @@ mod tests {
         let ppm = canvas_to_ppm(&c);
         assert_eq!(ppm[3..], expected)
     }
-
 }

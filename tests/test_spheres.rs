@@ -1,19 +1,19 @@
 mod tests {
     use tracer::matrix::Matrix;
-    use tracer::{point,vector};
     use tracer::ray::Ray;
-    use tracer::sphere::{intersect, Sphere,set_transform};
-    use tracer::transforms::{translation,scaling};
+    use tracer::sphere::{intersect, normal_at, set_transform, Sphere};
+    use tracer::transforms::{scaling, translation};
+    use tracer::{point, vector};
 
     #[test]
     fn test_ray_intersect_sphere() {
-            let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-            let s = Sphere::new();
-            let xs = intersect(s, r);
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let s = Sphere::new();
+        let xs = intersect(s, r);
 
-            assert_eq!(xs.len(), 2);
-            assert_eq!(xs[0].t, 4.0);
-            assert_eq!(xs[1].t, 6.0);
+        assert_eq!(xs.len(), 2);
+        assert_eq!(xs[0].t, 4.0);
+        assert_eq!(xs[1].t, 6.0);
     }
 
     #[test]
@@ -43,7 +43,7 @@ mod tests {
         assert_eq!(xs[0].t, -6.0);
         assert_eq!(xs[1].t, -4.0);
     }
-    
+
     #[test]
     fn test_object_intersection() {
         let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
@@ -93,5 +93,19 @@ mod tests {
         set_transform(&mut s, translation(5., 0., 0.));
         let xs = intersect(s, r);
         assert_eq!(xs.len(), 0);
+    }
+
+    #[test]
+    fn test_normal() {
+        let s = Sphere::new();
+        let n = normal_at(s, point(1., 0., 0.));
+        assert_eq!(n, vector(1., 0., 0.));
+    }
+
+    #[test]
+    fn test_normal_y() {
+        s = Sphere::new();
+        let n = normal_at(s, point(0., 1., 0.));
+        assert_eq!(n, vector(0., 1., 0.));
     }
 }

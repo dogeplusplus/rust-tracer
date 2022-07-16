@@ -20,7 +20,6 @@ pub fn scaling(x: f32, y: f32, z: f32) -> Matrix<f32, 4, 4> {
     scale_mat
 }
 
-
 pub fn rotation_x(r: f32) -> Matrix<f32, 4, 4> {
     let rot_matrix_x = Matrix::new([
         [1., 0., 0., 0.],

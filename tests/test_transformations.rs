@@ -1,7 +1,7 @@
 mod tests {
     use std::f32::consts::PI;
-    use tracer::{point, vector, magnitude};
-    use tracer::transforms::{translation, scaling, rotation_x, rotation_y, rotation_z, shearing};
+    use tracer::transforms::{rotation_x, rotation_y, rotation_z, scaling, shearing, translation};
+    use tracer::{magnitude, point, vector};
 
     #[test]
     fn test_translation() {
@@ -81,7 +81,7 @@ mod tests {
         let half_quarter = rotation_x(PI / 4.);
         let inv = half_quarter.inverse()?;
         let expected = point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.);
-        let diff = inv * p - expected; 
+        let diff = inv * p - expected;
         assert!(magnitude(diff) < 1e-5);
         Ok(())
     }
@@ -168,7 +168,7 @@ mod tests {
         let c = translation(10., 5., 7.);
 
         let p2 = a * p;
-        
+
         let diff = p2 - point(1., -1., 0.);
         assert!(magnitude(diff) < 1e-5);
 

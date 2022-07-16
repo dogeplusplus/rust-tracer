@@ -1,6 +1,6 @@
 use crate::sphere::Sphere;
 
-#[derive(Debug,PartialEq,Clone,Copy)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Intersection {
     pub t: f32,
     pub object: Sphere,
@@ -13,7 +13,10 @@ impl Intersection {
 }
 
 pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
-    let valid_intersections: Vec<Intersection> = intersections.into_iter().filter(|x| x.t >= 0.).collect::<Vec<Intersection>>();
+    let valid_intersections: Vec<Intersection> = intersections
+        .into_iter()
+        .filter(|x| x.t >= 0.)
+        .collect::<Vec<Intersection>>();
     if valid_intersections.len() > 0 {
         let mut min_intersection = valid_intersections[0];
         for intersect in valid_intersections {

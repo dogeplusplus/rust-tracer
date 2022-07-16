@@ -2,7 +2,7 @@ use crate::Color;
 
 const MAX_PPM_LEN: usize = 70;
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Canvas {
     pub height: u32,
     pub width: u32,
@@ -16,13 +16,17 @@ impl Canvas {
             pixels.push(vec![Color::new(0.0, 0.0, 0.0); width as usize]);
         }
 
-        Canvas { width, height, pixels }
+        Canvas {
+            width,
+            height,
+            pixels,
+        }
     }
 }
 
 pub fn write_pixel(canvas: &mut Canvas, x: usize, y: usize, color: Color) {
     canvas.pixels[y][x] = color;
-} 
+}
 
 pub fn pixel_at(canvas: &Canvas, x: usize, y: usize) -> Color {
     canvas.pixels[y][x]
@@ -39,7 +43,6 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
     for row in &canvas.pixels {
         let mut row_txt = String::new();
         for pix in row {
-
             let red_u8 = (pix.red.clamp(0.0, 1.0) * 255.) as u8;
             let green_u8 = (pix.green.clamp(0.0, 1.0) * 255.) as u8;
             let blue_u8 = (pix.blue.clamp(0.0, 1.0) * 255.) as u8;
@@ -51,7 +54,7 @@ pub fn canvas_to_ppm(canvas: &Canvas) -> Vec<String> {
                     row_txt = String::new();
                 } else if !row_txt.is_empty() {
                     row_txt.push(' ');
-                } 
+                }
                 row_txt.push_str(&color_str);
             }
         }

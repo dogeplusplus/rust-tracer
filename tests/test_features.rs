@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::{Tuple, point, vector, magnitude, normalize, dot, cross, Color};
+    use tracer::{cross, dot, magnitude, normalize, point, vector, Color, Tuple};
 
     #[test]
     fn test_vector_raw() {
@@ -77,7 +77,7 @@ mod tests {
 
     #[test]
     fn test_sub_zero() {
-        let zero = vector(0., 0. , 0.);
+        let zero = vector(0., 0., 0.);
         let v = vector(1., -2., -3.);
         let diff = zero - v;
 
@@ -135,7 +135,14 @@ mod tests {
         assert_eq!(normalize(v), vector(1., 0., 0.));
 
         let v = vector(1., 2., 3.);
-        assert_eq!(normalize(v), vector(1. / f32::sqrt(14.), 2. / f32::sqrt(14.), 3. / f32::sqrt(14.)));
+        assert_eq!(
+            normalize(v),
+            vector(
+                1. / f32::sqrt(14.),
+                2. / f32::sqrt(14.),
+                3. / f32::sqrt(14.)
+            )
+        );
 
         let norm = normalize(v);
         assert!((magnitude(norm) - 1.).abs() < f32::EPSILON)
@@ -170,29 +177,20 @@ mod tests {
         let c1 = Color::new(0.9, 0.6, 0.75);
         let c2 = Color::new(0.7, 0.1, 0.25);
 
-        assert_eq!(
-            c1 + c2,
-            Color::new(1.6, 0.7, 1.0)
-        )
+        assert_eq!(c1 + c2, Color::new(1.6, 0.7, 1.0))
     }
 
     #[test]
     fn test_sub_color() {
         let c1 = Color::new(0.9, 0.6, 0.75);
         let c2 = Color::new(0.7, 0.1, 0.25);
-        assert_eq!(
-            c1 - c2,
-            Color::new(0.2, 0.5, 0.5)
-        )
+        assert_eq!(c1 - c2, Color::new(0.2, 0.5, 0.5))
     }
 
     #[test]
     fn test_mul_color_scalar() {
         let c1 = Color::new(0.2, 0.3, 0.4);
-        assert_eq!(
-            c1 * 2.,
-            Color::new(0.4, 0.6, 0.8)
-        )
+        assert_eq!(c1 * 2., Color::new(0.4, 0.6, 0.8))
     }
 
     #[test]
@@ -203,5 +201,4 @@ mod tests {
         let expected = Color::new(0.9, 0.2, 0.04);
         assert_eq!(c1 * c2, expected)
     }
-
 }

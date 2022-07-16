@@ -1,6 +1,6 @@
 mod tests {
+    use tracer::intersections::{hit, Intersection};
     use tracer::sphere::Sphere;
-    use tracer::intersections::{Intersection,hit};
 
     #[test]
     fn test_intersection() {
@@ -21,7 +21,6 @@ mod tests {
         assert_eq!(xs[0].t, 1.);
         assert_eq!(xs[1].t, 2.);
     }
-
 
     #[test]
     fn test_hit_positive() {

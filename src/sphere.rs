@@ -1,14 +1,13 @@
 use crate::intersections::Intersection;
-use crate::{Tuple,dot,point};
-use crate::ray::{Ray,transform};
 use crate::matrix::Matrix;
+use crate::ray::{transform, Ray};
+use crate::{dot, point, Tuple};
 
-
-#[derive(Debug,PartialEq,Clone,Copy)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Sphere {
     pub center: Tuple,
     pub radius: f32,
-    pub transform: Matrix<f32, 4, 4>
+    pub transform: Matrix<f32, 4, 4>,
 }
 
 impl Sphere {
@@ -19,7 +18,11 @@ impl Sphere {
             [0., 0., 1., 0.],
             [0., 0., 0., 1.],
         ]);
-        Sphere { center: point(0., 0., 0.), radius: 1., transform: identity }
+        Sphere {
+            center: point(0., 0., 0.),
+            radius: 1.,
+            transform: identity,
+        }
     }
 }
 
