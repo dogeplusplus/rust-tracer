@@ -1,21 +1,30 @@
 use crate::intersections::Intersection;
 use crate::{Tuple,dot,point};
-use crate::ray::Ray;
+use crate::ray::{Ray,transform};
+use crate::matrix::Matrix;
 
 
 #[derive(Debug,PartialEq,Clone,Copy)]
 pub struct Sphere {
     pub center: Tuple,
     pub radius: f32,
+    pub transform: Matrix<f32, 4, 4>
 }
 
 impl Sphere {
     pub fn new() -> Self {
-        Sphere { center: point(0., 0., 0.), radius: 1. }
+        let identity = Matrix::new([
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.],
+        ]);
+        Sphere { center: point(0., 0., 0.), radius: 1., transform: identity }
     }
 }
 
 pub fn intersect(sphere: Sphere, ray: Ray) -> Vec<Intersection> {
+    let ray = transform(ray, sphere.transform.inverse().unwrap());
     let sphere_to_ray = ray.origin - point(0., 0., 0.);
     let a = dot(ray.direction, ray.direction);
     let b = 2. * dot(ray.direction, sphere_to_ray);
@@ -30,4 +39,8 @@ pub fn intersect(sphere: Sphere, ray: Ray) -> Vec<Intersection> {
         let t2 = (-b + f32::sqrt(discriminant)) / (2. * a);
         vec![Intersection::new(t1, sphere), Intersection::new(t2, sphere)]
     }
+}
+
+pub fn set_transform(sphere: &mut Sphere, transform: Matrix<f32, 4, 4>) {
+    sphere.transform = transform;
 }

@@ -1,7 +1,9 @@
 mod tests {
+    use tracer::matrix::Matrix;
     use tracer::{point,vector};
     use tracer::ray::Ray;
-    use tracer::sphere::{intersect, Sphere};
+    use tracer::sphere::{intersect, Sphere,set_transform};
+    use tracer::transforms::{translation,scaling};
 
     #[test]
     fn test_ray_intersect_sphere() {
@@ -50,5 +52,46 @@ mod tests {
         assert_eq!(xs.len(), 2);
         assert_eq!(xs[0].object, s);
         assert_eq!(xs[1].object, s);
+    }
+
+    #[test]
+    fn test_default_transformation() {
+        let s = Sphere::new();
+        let identity = Matrix::new([
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.],
+        ]);
+        assert_eq!(s.transform, identity);
+    }
+
+    #[test]
+    fn test_change_transform() {
+        let mut s = Sphere::new();
+        let t = translation(2., 3., 4.);
+        set_transform(&mut s, t);
+        assert_eq!(s.transform, t);
+    }
+
+    #[test]
+    fn test_scaled_sphere_ray() {
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let mut s = Sphere::new();
+        set_transform(&mut s, scaling(2., 2., 2.));
+        let xs = intersect(s, r);
+
+        assert_eq!(xs.len(), 2);
+        assert_eq!(xs[0].t, 3.);
+        assert_eq!(xs[1].t, 7.);
+    }
+
+    #[test]
+    fn test_intersect_translated_sphere() {
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let mut s = Sphere::new();
+        set_transform(&mut s, translation(5., 0., 0.));
+        let xs = intersect(s, r);
+        assert_eq!(xs.len(), 0);
     }
 }
