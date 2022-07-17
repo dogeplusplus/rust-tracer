@@ -1,4 +1,5 @@
 use crate::intersections::Intersection;
+use crate::materials::Material;
 use crate::matrix::Matrix;
 use crate::ray::{transform, Ray};
 use crate::{dot, normalize, point, Tuple};
@@ -8,10 +9,11 @@ pub struct Sphere {
     pub center: Tuple,
     pub radius: f32,
     pub transform: Matrix<f32, 4, 4>,
+    pub material: Material,
 }
 
-impl Sphere {
-    pub fn new() -> Self {
+impl Default for Sphere {
+    fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
             [0., 1., 0., 0.],
@@ -22,6 +24,7 @@ impl Sphere {
             center: point(0., 0., 0.),
             radius: 1.,
             transform: identity,
+            material: Material::default(),
         }
     }
 }

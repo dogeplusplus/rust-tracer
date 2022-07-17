@@ -5,6 +5,8 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub mod canvas;
 pub mod intersections;
+pub mod lights;
+pub mod materials;
 pub mod matrix;
 pub mod ray;
 pub mod sphere;
@@ -232,4 +234,8 @@ impl Color {
     pub fn new(red: f32, green: f32, blue: f32) -> Self {
         Color { red, green, blue }
     }
+}
+
+pub fn reflect(vector: Tuple, normal: Tuple) -> Tuple {
+    vector - normal * 2. * dot(vector, normal)
 }

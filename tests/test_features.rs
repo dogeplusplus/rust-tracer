@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::{cross, dot, magnitude, normalize, point, vector, Color, Tuple};
+    use tracer::{cross, dot, magnitude, normalize, point, reflect, vector, Color, Tuple};
 
     #[test]
     fn test_vector_raw() {
@@ -54,7 +54,7 @@ mod tests {
         let p2 = point(5., 6., 7.);
 
         let diff = p1 - p2;
-        assert_eq!(diff, vector(-2., -4., -6.))
+        assert_eq!(diff, vector(-2., -4., -6.));
     }
 
     #[test]
@@ -63,7 +63,7 @@ mod tests {
         let v = vector(5., 6., 7.);
 
         let diff = p - v;
-        assert_eq!(diff, point(-2., -4., -6.))
+        assert_eq!(diff, point(-2., -4., -6.));
     }
 
     #[test]
@@ -72,7 +72,7 @@ mod tests {
         let v2 = vector(5., 6., 7.);
         let diff = v1 - v2;
 
-        assert_eq!(diff, vector(-2., -4., -6.))
+        assert_eq!(diff, vector(-2., -4., -6.));
     }
 
     #[test]
@@ -81,34 +81,34 @@ mod tests {
         let v = vector(1., -2., -3.);
         let diff = zero - v;
 
-        assert_eq!(diff, vector(-1., 2., 3.))
+        assert_eq!(diff, vector(-1., 2., 3.));
     }
 
     #[test]
     fn test_negate() {
         let a = Tuple::new(1., -2., 3., -4.);
-        assert_eq!(-a, Tuple::new(-1., 2., -3., 4.))
+        assert_eq!(-a, Tuple::new(-1., 2., -3., 4.));
     }
 
     #[test]
     fn test_multiply() {
         let a = Tuple::new(1., -2., 3., -4.);
         let result = a * 3.5;
-        assert_eq!(result, Tuple::new(3.5, -7., 10.5, -14.))
+        assert_eq!(result, Tuple::new(3.5, -7., 10.5, -14.));
     }
 
     #[test]
     fn test_multiply_fraction() {
         let a = Tuple::new(1., -2., 3., -4.);
         let result = a * 0.5;
-        assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.))
+        assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.));
     }
 
     #[test]
     fn test_divide() {
         let a = Tuple::new(1., -2., 3., -4.);
         let result = a / 2.;
-        assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.))
+        assert_eq!(result, Tuple::new(0.5, -1., 1.5, -2.));
     }
 
     #[test]
@@ -145,14 +145,14 @@ mod tests {
         );
 
         let norm = normalize(v);
-        assert!((magnitude(norm) - 1.).abs() < f32::EPSILON)
+        assert!((magnitude(norm) - 1.).abs() < f32::EPSILON);
     }
 
     #[test]
     fn test_dot_product() {
         let a = vector(1., 2., 3.);
         let b = vector(2., 3., 4.);
-        assert_eq!(dot(a, b), 20.)
+        assert_eq!(dot(a, b), 20.);
     }
 
     #[test]
@@ -177,20 +177,20 @@ mod tests {
         let c1 = Color::new(0.9, 0.6, 0.75);
         let c2 = Color::new(0.7, 0.1, 0.25);
 
-        assert_eq!(c1 + c2, Color::new(1.6, 0.7, 1.0))
+        assert_eq!(c1 + c2, Color::new(1.6, 0.7, 1.0));
     }
 
     #[test]
     fn test_sub_color() {
         let c1 = Color::new(0.9, 0.6, 0.75);
         let c2 = Color::new(0.7, 0.1, 0.25);
-        assert_eq!(c1 - c2, Color::new(0.2, 0.5, 0.5))
+        assert_eq!(c1 - c2, Color::new(0.2, 0.5, 0.5));
     }
 
     #[test]
     fn test_mul_color_scalar() {
         let c1 = Color::new(0.2, 0.3, 0.4);
-        assert_eq!(c1 * 2., Color::new(0.4, 0.6, 0.8))
+        assert_eq!(c1 * 2., Color::new(0.4, 0.6, 0.8));
     }
 
     #[test]
@@ -199,6 +199,23 @@ mod tests {
         let c2 = Color::new(0.9, 1.0, 0.1);
 
         let expected = Color::new(0.9, 0.2, 0.04);
-        assert_eq!(c1 * c2, expected)
+        assert_eq!(c1 * c2, expected);
+    }
+
+    #[test]
+    fn test_reflect_45() {
+        let v = vector(1., -1., 0.);
+        let n = vector(0., 1., 0.);
+        let r = reflect(v, n);
+        assert_eq!(r, vector(1., 1., 0.));
+    }
+
+    #[test]
+    fn test_reflect_slanted() {
+        let v = vector(0., -1., 0.);
+        let n = vector(f32::sqrt(2.) / 2., f32::sqrt(2.) / 2., 0.);
+        let r = reflect(v, n);
+        let diff = r - vector(1., 0., 0.);
+        assert!(magnitude(diff) < f32::EPSILON);
     }
 }
