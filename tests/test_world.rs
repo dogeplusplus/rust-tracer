@@ -1,5 +1,7 @@
 mod tests {
     use tracer::{
+        intersections::prepare_computations,
+        intersections::Intersection,
         lights::PointLight,
         materials::Material,
         point,
@@ -7,7 +9,7 @@ mod tests {
         sphere::Sphere,
         transforms::scaling,
         vector,
-        world::{contains, intersect_world, World},
+        world::{contains, intersect_world, World, shade_hit},
         Color,
     };
 
@@ -48,5 +50,28 @@ mod tests {
         assert_eq!(xs[1].t, 4.5);
         assert_eq!(xs[2].t, 5.5);
         assert_eq!(xs[3].t, 6.);
+    }
+
+    #[test]
+    fn test_shade_intersection() {
+        let w = World::default();
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let shape = w.objects[0];
+        let i = Intersection::new(4., shape);
+        let comps = prepare_computations(i, r);
+        let c = shade_hit(w, comps);
+        assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855))
+    }
+
+    #[test]
+    fn test_shade_intersection_inside() {
+        let mut w = World::default();
+        w.light = Some(PointLight::new(point(0., 0.25, 0.), Color::new(1., 1., 1.)));
+        let r = Ray::new(point(0., 0., 0.), vector(0., 0., 1.));
+        let shape = w.objects[1];
+        let i = Intersection::new(0.5, shape);
+        let comps = prepare_computations(i, r);
+        let c = shade_hit(w, comps);
+        assert_eq!(c, Color::new(0.90498, 0.90498, 0.90498));
     }
 }

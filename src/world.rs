@@ -1,6 +1,12 @@
 use crate::{
-    intersections::Intersection, lights::PointLight, materials::Material, point, ray::Ray,
-    sphere::{Sphere, intersect}, transforms::scaling, Color,
+    intersections::{Intersection, Precomputation},
+    lights::{PointLight, lighting},
+    materials::Material,
+    point,
+    ray::Ray,
+    sphere::{intersect, Sphere},
+    transforms::scaling,
+    Color,
 };
 
 #[derive(Clone)]
@@ -55,4 +61,8 @@ pub fn intersect_world(world: World, ray: Ray) -> Vec<Intersection> {
     }
     intersections.sort_by(|&a, &b| (a.t).partial_cmp(&b.t).unwrap());
     intersections
+}
+
+pub fn shade_hit(world: World, comps: Precomputation) -> Color {
+    lighting(comps.object.material, world.light.unwrap(), comps.point, comps.eyev, comps.normalv)
 }

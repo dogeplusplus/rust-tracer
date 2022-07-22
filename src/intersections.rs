@@ -1,4 +1,4 @@
-use crate::sphere::Sphere;
+use crate::{sphere::{Sphere, normal_at}, Tuple, ray::{Ray, position}, dot};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Intersection {
@@ -27,4 +27,33 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
         return Some(min_intersection);
     }
     None
+}
+
+pub struct Precomputation{
+    pub t: f32,
+    pub object: Sphere,
+    pub point: Tuple,
+    pub eyev: Tuple,
+    pub normalv: Tuple,
+    pub inside: bool,
+}
+
+pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
+    let pos = position(ray, intersection.t);
+    let mut normal = normal_at(intersection.object, pos);
+    let eye = -ray.direction;
+    let mut inside = false;
+    if dot(normal, eye) < 0. {
+        normal = -normal;
+        inside = true;
+    }
+
+    Precomputation {
+        t: intersection.t,
+        object: intersection.object,
+        point: pos,
+        eyev: eye,
+        normalv: normal,
+        inside: inside,
+    }
 }
