@@ -1,5 +1,5 @@
 use crate::{
-    intersections::{Intersection, Precomputation},
+    intersections::{Intersection, Precomputation, hit, prepare_computations},
     lights::{PointLight, lighting},
     materials::Material,
     point,
@@ -53,16 +53,28 @@ pub fn contains(world: &World, object: Sphere) -> bool {
     false
 }
 
-pub fn intersect_world(world: World, ray: Ray) -> Vec<Intersection> {
+pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
     let mut intersections = Vec::new();
-    for obj in world.objects {
-        let obj_intersects = intersect(obj, ray);
+    for obj in &world.objects {
+        let obj_intersects = intersect(*obj, ray);
         intersections.extend(obj_intersects);
     }
     intersections.sort_by(|&a, &b| (a.t).partial_cmp(&b.t).unwrap());
     intersections
 }
 
-pub fn shade_hit(world: World, comps: Precomputation) -> Color {
+pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
     lighting(comps.object.material, world.light.unwrap(), comps.point, comps.eyev, comps.normalv)
+}
+
+pub fn color_at(world: &World, ray: Ray) -> Color {
+    let intersections = intersect_world(world, ray);
+    let hits = hit(intersections);
+    
+    if hits.is_none() {
+        return Color::new(0., 0., 0.);
+    }
+
+    let comps = prepare_computations(hits.unwrap(), ray);
+    shade_hit(world, comps)
 }

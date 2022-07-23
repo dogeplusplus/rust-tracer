@@ -9,7 +9,7 @@ mod tests {
         sphere::Sphere,
         transforms::scaling,
         vector,
-        world::{contains, intersect_world, World, shade_hit},
+        world::{contains, intersect_world, World, shade_hit, color_at},
         Color,
     };
 
@@ -43,7 +43,7 @@ mod tests {
     fn test_intersect_world_ray() {
         let w = World::default();
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let xs = intersect_world(w, r);
+        let xs = intersect_world(&w, r);
 
         assert_eq!(xs.len(), 4);
         assert_eq!(xs[0].t, 4.);
@@ -59,7 +59,7 @@ mod tests {
         let shape = w.objects[0];
         let i = Intersection::new(4., shape);
         let comps = prepare_computations(i, r);
-        let c = shade_hit(w, comps);
+        let c = shade_hit(&w, comps);
         assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855))
     }
 
@@ -71,7 +71,34 @@ mod tests {
         let shape = w.objects[1];
         let i = Intersection::new(0.5, shape);
         let comps = prepare_computations(i, r);
-        let c = shade_hit(w, comps);
+        let c = shade_hit(&w, comps);
         assert_eq!(c, Color::new(0.90498, 0.90498, 0.90498));
+    }
+
+    #[test]
+    fn test_intersect_world_ray_miss() {
+        let w = World::default();
+        let r = Ray::new(point(0., 0., -5.), vector(0., 1., 0.));
+        let c = color_at(&w, r);
+        assert_eq!(c, Color::new(0., 0., 0.));
+    }
+
+    #[test]
+    fn test_intersect_world_ray_hit() {
+        let w = World::default();
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let c = color_at(&w, r);
+        assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855));
+    }
+
+    #[test]
+    fn test_intersection_behind_ray() {
+        let mut w = World::default();
+
+        w.objects[0].material.ambient = 1.;
+        w.objects[1].material.ambient = 1.;
+        let r = Ray::new(point(0., 0., 0.75), vector(0., 0., -1.));
+        let c = color_at(&w, r);
+        assert_eq!(c, w.objects[1].material.color);
     }
 }
