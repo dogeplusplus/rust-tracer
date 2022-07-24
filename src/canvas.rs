@@ -4,13 +4,13 @@ const MAX_PPM_LEN: usize = 70;
 
 #[derive(Debug, Clone)]
 pub struct Canvas {
-    pub height: u32,
-    pub width: u32,
+    pub height: usize,
+    pub width: usize,
     pub pixels: Vec<Vec<Color>>,
 }
 
 impl Canvas {
-    pub fn new(width: u32, height: u32) -> Self {
+    pub fn new(width: usize, height: usize) -> Self {
         let mut pixels = Vec::new();
         for _ in 0..height {
             pixels.push(vec![Color::new(0.0, 0.0, 0.0); width as usize]);

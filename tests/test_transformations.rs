@@ -1,6 +1,7 @@
 mod tests {
     use std::f32::consts::PI;
-    use tracer::transforms::{rotation_x, rotation_y, rotation_z, scaling, shearing, translation};
+    use tracer::matrix::Matrix;
+    use tracer::transforms::{rotation_x, rotation_y, rotation_z, scaling, shearing, translation, view_transform};
     use tracer::{magnitude, point, vector};
 
     #[test]
@@ -189,5 +190,53 @@ mod tests {
         let c = translation(10., 5., 7.);
         let t = c * b * a;
         assert_eq!(t * p, point(15., 0., 7.))
+    }
+
+    #[test]
+    fn test_view_transform_default() {
+        let from = point(0., 0., 0.);
+        let to = point(0., 0., -1.);
+        let up = vector(0., 1., 0.);
+        let t = view_transform(from, to, up);
+        let identity = Matrix::new([
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.],
+        ]);
+        assert_eq!(t, identity);
+    }
+
+    #[test]
+    fn test_view_positive_z() {
+        let from = point(0., 0., 0.);
+        let to = point(0., 0., 1.);
+        let up = vector(0., 1., 0.);
+        let t = view_transform(from, to, up);
+        assert_eq!(t, scaling(-1., 1., -1.));
+    }
+
+    #[test]
+    fn test_view_transformation_moves_world() {
+        let from = point(0., 0., 8.);
+        let to = point(0., 0., 0.);
+        let up = vector(0., 1., 0.);
+        let t = view_transform(from, to, up);
+        assert_eq!(t, translation(0., 0., -8.));
+    }
+
+    #[test]
+    fn test_arbitrary_view_transformation() {
+        let from = point(1., 3., 2.);
+        let to = point(4., -2., 8.);
+        let up = vector(1., 1., 0.);
+        let t = view_transform(from, to, up);
+        let expected = Matrix::new([
+            [-0.50709254, 0.50709254, 0.6761234, -2.366432],
+            [0.76771593, 0.6060915, 0.12121832, -2.828427],
+            [-0.35856858, 0.59761435, -0.71713716, -2.3841858e-7],
+            [0.0, 0.0, 0.0, 1.0]
+        ]);
+        assert_eq!(t, expected);
     }
 }

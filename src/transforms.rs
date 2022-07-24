@@ -1,4 +1,4 @@
-use crate::matrix::Matrix;
+use crate::{matrix::Matrix, cross, normalize, Tuple};
 
 pub fn translation(x: f32, y: f32, z: f32) -> Matrix<f32, 4, 4> {
     let trans_mat = Matrix::new([
@@ -58,4 +58,20 @@ pub fn shearing(xy: f32, xz: f32, yx: f32, yz: f32, zx: f32, zy: f32) -> Matrix<
         [0., 0., 0., 1.],
     ]);
     shear
+}
+
+pub fn view_transform(from: Tuple, to: Tuple, up: Tuple) -> Matrix<f32, 4, 4> {
+    let forward = normalize(to - from);
+    let upn = normalize(up);
+    let left = cross(forward, upn);
+    let true_up = cross(left, forward);
+
+    let orientation = Matrix::new([
+        [left.x, left.y, left.z, 0.],
+        [true_up.x, true_up.y, true_up.z, 0.],
+        [-forward.x, -forward.y, -forward.z, 0.],
+        [0., 0., 0., 1.],
+    ]);
+
+    orientation * translation(-from.x, -from.y, -from.z)
 }

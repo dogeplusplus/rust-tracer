@@ -12,6 +12,7 @@ pub mod ray;
 pub mod sphere;
 pub mod transforms;
 pub mod world;
+pub mod camera;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
