@@ -9,7 +9,7 @@ mod tests {
         sphere::Sphere,
         transforms::scaling,
         vector,
-        world::{contains, intersect_world, World, shade_hit, color_at},
+        world::{color_at, contains, intersect_world, shade_hit, World},
         Color,
     };
 

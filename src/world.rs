@@ -1,6 +1,6 @@
 use crate::{
-    intersections::{Intersection, Precomputation, hit, prepare_computations},
-    lights::{PointLight, lighting},
+    intersections::{hit, prepare_computations, Intersection, Precomputation},
+    lights::{lighting, PointLight},
     materials::Material,
     point,
     ray::Ray,
@@ -64,13 +64,19 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
 }
 
 pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
-    lighting(comps.object.material, world.light.unwrap(), comps.point, comps.eyev, comps.normalv)
+    lighting(
+        comps.object.material,
+        world.light.unwrap(),
+        comps.point,
+        comps.eyev,
+        comps.normalv,
+    )
 }
 
 pub fn color_at(world: &World, ray: Ray) -> Color {
     let intersections = intersect_world(world, ray);
     let hits = hit(intersections);
-    
+
     if hits.is_none() {
         return Color::new(0., 0., 0.);
     }

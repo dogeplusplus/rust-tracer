@@ -1,13 +1,12 @@
 mod tests {
     use std::f32::consts::PI;
-    use tracer::camera::{Camera, ray_for_pixel, render};
+    use tracer::camera::{ray_for_pixel, render, Camera};
     use tracer::canvas::pixel_at;
     use tracer::matrix::Matrix;
-    use tracer::world::World;
-    use tracer::{point, vector, magnitude};
     use tracer::transforms::{rotation_y, translation, view_transform};
+    use tracer::world::World;
     use tracer::Color;
-
+    use tracer::{magnitude, point, vector};
 
     #[test]
     fn test_camera_construction() {
@@ -58,17 +57,19 @@ mod tests {
     }
 
     #[test]
-    fn test_ray_camera_transform() -> Result<(), String>{
+    fn test_ray_camera_transform() -> Result<(), String> {
         let mut c = Camera::new(201, 101, PI / 2.);
         c.transform = rotation_y(PI / 4.) * translation(0., -2., 5.);
         let r = ray_for_pixel(c, 100, 50)?;
         assert!(magnitude(r.origin - point(0., 2., -5.)) < 1e-5);
-        assert!(magnitude(r.direction - vector(1. / f32::sqrt(2.), 0., -1. / f32::sqrt(2.))) < 1e-5);
+        assert!(
+            magnitude(r.direction - vector(1. / f32::sqrt(2.), 0., -1. / f32::sqrt(2.))) < 1e-5
+        );
         Ok(())
     }
 
     #[test]
-    fn test_render_world() -> Result<(), String>{
+    fn test_render_world() -> Result<(), String> {
         let w = World::default();
         let mut c = Camera::new(11, 11, PI / 2.);
         let from = point(0., 0., -5.);

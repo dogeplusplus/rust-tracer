@@ -1,4 +1,4 @@
-use crate::{matrix::Matrix, cross, normalize, Tuple};
+use crate::{cross, matrix::Matrix, normalize, Tuple};
 
 pub fn translation(x: f32, y: f32, z: f32) -> Matrix<f32, 4, 4> {
     let trans_mat = Matrix::new([

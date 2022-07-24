@@ -3,6 +3,7 @@ use std::fmt;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+pub mod camera;
 pub mod canvas;
 pub mod intersections;
 pub mod lights;
@@ -12,7 +13,6 @@ pub mod ray;
 pub mod sphere;
 pub mod transforms;
 pub mod world;
-pub mod camera;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

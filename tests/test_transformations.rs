@@ -1,7 +1,9 @@
 mod tests {
     use std::f32::consts::PI;
     use tracer::matrix::Matrix;
-    use tracer::transforms::{rotation_x, rotation_y, rotation_z, scaling, shearing, translation, view_transform};
+    use tracer::transforms::{
+        rotation_x, rotation_y, rotation_z, scaling, shearing, translation, view_transform,
+    };
     use tracer::{magnitude, point, vector};
 
     #[test]
@@ -235,7 +237,7 @@ mod tests {
             [-0.50709254, 0.50709254, 0.6761234, -2.366432],
             [0.76771593, 0.6060915, 0.12121832, -2.828427],
             [-0.35856858, 0.59761435, -0.71713716, -2.3841858e-7],
-            [0.0, 0.0, 0.0, 1.0]
+            [0.0, 0.0, 0.0, 1.0],
         ]);
         assert_eq!(t, expected);
     }

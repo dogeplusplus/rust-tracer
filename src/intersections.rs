@@ -1,4 +1,9 @@
-use crate::{sphere::{Sphere, normal_at}, Tuple, ray::{Ray, position}, dot};
+use crate::{
+    dot,
+    ray::{position, Ray},
+    sphere::{normal_at, Sphere},
+    Tuple,
+};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Intersection {
@@ -29,7 +34,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
     None
 }
 
-pub struct Precomputation{
+pub struct Precomputation {
     pub t: f32,
     pub object: Sphere,
     pub point: Tuple,

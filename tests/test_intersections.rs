@@ -1,8 +1,8 @@
 mod tests {
-    use tracer::intersections::{hit, Intersection, prepare_computations};
-    use tracer::{point, vector};
-    use tracer::sphere::Sphere;
+    use tracer::intersections::{hit, prepare_computations, Intersection};
     use tracer::ray::Ray;
+    use tracer::sphere::Sphere;
+    use tracer::{point, vector};
 
     #[test]
     fn test_intersection() {

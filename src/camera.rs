@@ -1,4 +1,10 @@
-use crate::{ray::Ray, normalize, point, matrix::Matrix, canvas::{Canvas, write_pixel}, world::{color_at, World}};
+use crate::{
+    canvas::{write_pixel, Canvas},
+    matrix::Matrix,
+    normalize, point,
+    ray::Ray,
+    world::{color_at, World},
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {
@@ -13,7 +19,6 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(hsize: usize, vsize: usize, field_of_view: f32) -> Self {
-
         let half_view = f32::tan(field_of_view / 2.);
         let aspect = hsize as f32 / vsize as f32;
 
