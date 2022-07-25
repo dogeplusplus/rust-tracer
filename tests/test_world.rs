@@ -9,7 +9,7 @@ mod tests {
         sphere::Sphere,
         transforms::scaling,
         vector,
-        world::{color_at, contains, intersect_world, shade_hit, World},
+        world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed},
         Color,
     };
 
@@ -100,5 +100,33 @@ mod tests {
         let r = Ray::new(point(0., 0., 0.75), vector(0., 0., -1.));
         let c = color_at(&w, r);
         assert_eq!(c, w.objects[1].material.color);
+    }
+
+    #[test]
+    fn test_in_light_non_colinear() {
+        let w = World::default();
+        let p = point(0., 10., 0.);
+        assert!(!is_shadowed(&w, p));
+    }
+
+    #[test]
+    fn test_in_shadow_behind_object() {
+        let w = World::default();
+        let p = point(10., -10., 10.);
+        assert!(is_shadowed(&w, p));
+    }
+
+    #[test]
+    fn test_obj_behind_light() {
+        let w = World::default();
+        let p = point(-20., 20., -20.);
+        assert!(!is_shadowed(&w, p));
+    }
+
+    #[test]
+    fn test_point_between_light_and_obj() {
+        let w = World::default();
+        let p = point(-2., 2., -2.);
+        assert!(!is_shadowed(&w, p));
     }
 }

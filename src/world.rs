@@ -6,7 +6,7 @@ use crate::{
     ray::Ray,
     sphere::{intersect, Sphere},
     transforms::scaling,
-    Color,
+    Color, Tuple, magnitude, normalize,
 };
 
 #[derive(Clone)]
@@ -64,12 +64,14 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
 }
 
 pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
+    // TODO: figure out what to do wtih the in_shadow
     lighting(
         comps.object.material,
         world.light.unwrap(),
         comps.point,
         comps.eyev,
         comps.normalv,
+        false,
     )
 }
 
@@ -83,4 +85,25 @@ pub fn color_at(world: &World, ray: Ray) -> Color {
 
     let comps = prepare_computations(hits.unwrap(), ray);
     shade_hit(world, comps)
+}
+
+
+pub fn is_shadowed(world: &World, point: Tuple) -> bool {
+    if let Some(light) = world.light {
+        let v = light.position - point;
+        let distance = magnitude(v);
+        let direction = normalize(v);
+
+        let r = Ray::new(point, direction);
+        let intersections = intersect_world(world, r);
+
+        let h = hit(intersections);
+        if let Some(intersect) = h {
+            return intersect.t < distance;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }

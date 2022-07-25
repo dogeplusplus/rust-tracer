@@ -21,6 +21,7 @@ pub fn lighting(
     point: Tuple,
     eyev: Tuple,
     normalv: Tuple,
+    in_shadow: bool,
 ) -> Color {
     let effective_color = material.color * light.intensity;
     let lightv = normalize(light.position - point);
@@ -41,5 +42,9 @@ pub fn lighting(
             specular = light.intensity * material.specular * factor;
         }
     }
-    ambient + diffuse + specular
+
+    match in_shadow {
+        true => ambient,
+        _ => ambient + diffuse + specular,
+    }
 }
