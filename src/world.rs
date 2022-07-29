@@ -64,14 +64,13 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
 }
 
 pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
-    // TODO: figure out what to do wtih the in_shadow
     lighting(
         comps.object.material,
         world.light.unwrap(),
         comps.point,
         comps.eyev,
         comps.normalv,
-        false,
+        is_shadowed(world, comps.over_point),
     )
 }
 

@@ -41,6 +41,7 @@ pub struct Precomputation {
     pub eyev: Tuple,
     pub normalv: Tuple,
     pub inside: bool,
+    pub over_point: Tuple,
 }
 
 pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
@@ -52,6 +53,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         normal = -normal;
         inside = true;
     }
+    let over_point = pos + normal * f32::EPSILON;
 
     Precomputation {
         t: intersection.t,
@@ -59,6 +61,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         point: pos,
         eyev: eye,
         normalv: normal,
-        inside: inside,
+        inside,
+        over_point,
     }
 }

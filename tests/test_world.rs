@@ -6,8 +6,8 @@ mod tests {
         materials::Material,
         point,
         ray::Ray,
-        sphere::Sphere,
-        transforms::scaling,
+        sphere::{Sphere, set_transform},
+        transforms::{scaling, translation},
         vector,
         world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed},
         Color,
@@ -128,5 +128,31 @@ mod tests {
         let w = World::default();
         let p = point(-2., 2., -2.);
         assert!(!is_shadowed(&w, p));
+    }
+
+    #[test]
+    fn test_shade_hit_sphere() {
+        let mut w = World::new();
+        w.light = Some(PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.)));
+        let s1 = Sphere::default();
+        let mut s2 = Sphere::default();
+        set_transform(&mut s2, translation(0., 0., 10.));
+        w.objects = vec![s1, s2];
+        let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
+        let i = Intersection::new(4., s2);
+        let comps = prepare_computations(i, r);
+        let c = shade_hit(&w, comps);
+        assert_eq!(c, Color::new(0.1, 0.1, 0.1));
+    }
+
+    #[test]
+    fn test_hit_offset_point() {
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let mut shape = Sphere::default();
+        set_transform(&mut shape, translation(0., 0., 1.));
+        let i = Intersection::new(5., shape);
+        let comps = prepare_computations(i, r);
+        assert!(comps.over_point.z < -f32::EPSILON / 2.);
+        assert!(comps.point.z > comps.over_point.z)
     }
 }
