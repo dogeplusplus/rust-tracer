@@ -56,10 +56,18 @@ fn main() -> Result<(), &'static str> {
     left.material.diffuse = 0.7;
     left.material.specular = 1.;
 
+    let mut other = Sphere::default();
+    other.transform = shearing(0.5, -0.5, 0., 0., -0.5, -0.5) * translation(0., 0., 0.);
+    other.material = Material::default();
+    other.material.color = Color::new(0.4, 0.4, 0.2);
+    other.material.diffuse = 0.2;
+    other.material.specular = 150.;
+
+
     let mut world = World::default();
-    world.objects = vec![floor, left_wall, right_wall, middle, right, left];
+    world.objects = vec![floor, left_wall, right_wall, middle, right, left, other];
     world.light = Some(PointLight::new(point(-10., 10., -10.), Color::new(1., 1., 1.)));
-    let mut camera = Camera::new(250, 125, PI / 3.);
+    let mut camera = Camera::new(500, 250, PI / 3.);
     camera.transform = view_transform(point(0., 1.5, -5.), point(0., 1., 0.), vector(0., 1., 0.));
     let canvas = render(camera, world)?;
     let ppm = canvas_to_ppm(&canvas);

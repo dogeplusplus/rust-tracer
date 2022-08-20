@@ -1,8 +1,9 @@
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrix::Matrix;
-use crate::ray::{transform, Ray};
+use crate::ray::Ray;
 use crate::{dot, normalize, point, Tuple};
+use crate::shape::Shape;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Sphere {
@@ -29,34 +30,35 @@ impl Default for Sphere {
     }
 }
 
-pub fn intersect(sphere: Sphere, ray: Ray) -> Vec<Intersection> {
-    let ray = transform(ray, sphere.transform.inverse().unwrap());
-    let sphere_to_ray = ray.origin - point(0., 0., 0.);
-    let a = dot(ray.direction, ray.direction);
-    let b = 2. * dot(ray.direction, sphere_to_ray);
-    let c = dot(sphere_to_ray, sphere_to_ray) - 1.;
+impl Shape for Sphere {
+    fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
+        let sphere_to_ray = ray.origin - point(0., 0., 0.);
+        let a = dot(ray.direction, ray.direction);
+        let b = 2. * dot(ray.direction, sphere_to_ray);
+        let c = dot(sphere_to_ray, sphere_to_ray) - 1.;
 
-    let discriminant = b * b - 4. * a * c;
+        let discriminant = b * b - 4. * a * c;
 
-    if discriminant < 0. {
-        Vec::new()
-    } else {
-        let t1 = (-b - f32::sqrt(discriminant)) / (2. * a);
-        let t2 = (-b + f32::sqrt(discriminant)) / (2. * a);
-        vec![Intersection::new(t1, sphere), Intersection::new(t2, sphere)]
+        if discriminant < 0. {
+            Vec::new()
+        } else {
+            let t1 = (-b - f32::sqrt(discriminant)) / (2. * a);
+            let t2 = (-b + f32::sqrt(discriminant)) / (2. * a);
+            vec![Intersection::new(t1, *self), Intersection::new(t2, *self)]
+        }
     }
-}
 
-pub fn set_transform(sphere: &mut Sphere, transform: Matrix<f32, 4, 4>) {
-    sphere.transform = transform;
-}
+    fn set_transform(&mut self, transform: Matrix<f32, 4, 4>) {
+        self.transform = transform;
+    }
 
-pub fn normal_at(s: Sphere, world_point: Tuple) -> Tuple {
-    let inverse = s.transform.inverse().unwrap();
-    let object_point = inverse * world_point;
-    let object_normal = object_point - point(0., 0., 0.);
-    let mut world_normal = inverse.transpose() * object_normal;
-    world_normal.w = 0.0;
+    fn get_transform(&self) -> Matrix<f32, 4, 4> {
+        self.transform
+    }
 
-    normalize(world_normal)
+    fn local_normal_at(&self, world_point: Tuple) -> Tuple {
+        let mut world_normal = world_point;
+        world_normal.w = 0.0;
+        normalize(world_normal)
+    }
 }

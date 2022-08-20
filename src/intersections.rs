@@ -1,8 +1,9 @@
 use crate::{
     dot,
     ray::{position, Ray},
-    sphere::{normal_at, Sphere},
+    shape::normal_at,
     Tuple,
+    sphere::Sphere,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -53,7 +54,8 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         normal = -normal;
         inside = true;
     }
-    let over_point = pos + normal * f32::EPSILON;
+    // Based on experiments, seems like this amount of perturbation is needed to avoid acne
+    let over_point = pos + normal * 1e-2;
 
     Precomputation {
         t: intersection.t,

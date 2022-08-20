@@ -10,6 +10,7 @@ pub mod lights;
 pub mod materials;
 pub mod matrix;
 pub mod ray;
+pub mod shape;
 pub mod sphere;
 pub mod transforms;
 pub mod world;

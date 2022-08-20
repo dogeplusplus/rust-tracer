@@ -6,7 +6,8 @@ mod tests {
         materials::Material,
         point,
         ray::Ray,
-        sphere::{Sphere, set_transform},
+        shape::Shape,
+        sphere::Sphere,
         transforms::{scaling, translation},
         vector,
         world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed},
@@ -136,7 +137,7 @@ mod tests {
         w.light = Some(PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.)));
         let s1 = Sphere::default();
         let mut s2 = Sphere::default();
-        set_transform(&mut s2, translation(0., 0., 10.));
+        s2.set_transform(translation(0., 0., 10.));
         w.objects = vec![s1, s2];
         let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
         let i = Intersection::new(4., s2);
@@ -149,7 +150,7 @@ mod tests {
     fn test_hit_offset_point() {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut shape = Sphere::default();
-        set_transform(&mut shape, translation(0., 0., 1.));
+        shape.set_transform(translation(0., 0., 1.));
         let i = Intersection::new(5., shape);
         let comps = prepare_computations(i, r);
         assert!(comps.over_point.z < -f32::EPSILON / 2.);

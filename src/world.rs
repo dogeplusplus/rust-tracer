@@ -4,7 +4,8 @@ use crate::{
     materials::Material,
     point,
     ray::Ray,
-    sphere::{intersect, Sphere},
+    shape::intersect,
+    sphere::Sphere,
     transforms::scaling,
     Color, Tuple, magnitude, normalize,
 };
