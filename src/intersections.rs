@@ -3,17 +3,17 @@ use crate::{
     ray::{position, Ray},
     shape::normal_at,
     Tuple,
-    sphere::Sphere,
+    world::ShapeEnum,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Intersection {
     pub t: f32,
-    pub object: Sphere,
+    pub object: ShapeEnum,
 }
 
 impl Intersection {
-    pub fn new(t: f32, object: Sphere) -> Self {
+    pub fn new(t: f32, object: ShapeEnum) -> Self {
         Intersection { t, object }
     }
 }
@@ -37,7 +37,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
 
 pub struct Precomputation {
     pub t: f32,
-    pub object: Sphere,
+    pub object: ShapeEnum,
     pub point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
@@ -47,7 +47,11 @@ pub struct Precomputation {
 
 pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
     let pos = position(ray, intersection.t);
-    let mut normal = normal_at(intersection.object, pos);
+    let mut normal = match intersection.object {
+        obj => normal_at(obj, pos);
+        _ => panic!();
+    }
+    // let mut normal = normal_at(intersection.object, pos);
     let eye = -ray.direction;
     let mut inside = false;
     if dot(normal, eye) < 0. {

@@ -7,12 +7,19 @@ use crate::{
     shape::intersect,
     sphere::Sphere,
     transforms::scaling,
-    Color, Tuple, magnitude, normalize,
+    Color, Tuple, magnitude, normalize, plane::Plane,
 };
+
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ShapeEnum {
+    Sphere(Sphere),
+    Plane(Plane),
+}
 
 #[derive(Clone)]
 pub struct World {
-    pub objects: Vec<Sphere>,
+    pub objects: Vec<ShapeEnum>,
     pub light: Option<PointLight>,
 }
 
@@ -28,7 +35,7 @@ impl Default for World {
 
         let mut s2 = Sphere::default();
         s2.transform = scaling(0.5, 0.5, 0.5);
-        let objects = vec![s1, s2];
+        let objects = vec![ShapeEnum::Sphere(s1), ShapeEnum::Sphere(s2)];
         World {
             objects,
             light: Some(light),
@@ -45,7 +52,7 @@ impl World {
     }
 }
 
-pub fn contains(world: &World, object: Sphere) -> bool {
+pub fn contains(world: &World, object: ShapeEnum) -> bool {
     for obj in &world.objects {
         if *obj == object {
             return true;
