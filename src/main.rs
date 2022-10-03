@@ -2,39 +2,17 @@ use std::f32::consts::PI;
 use std::fs::File;
 use std::io::Write;
 use tracer::camera::render;
-use tracer::canvas::{canvas_to_ppm};
+use tracer::canvas::canvas_to_ppm;
 use tracer::materials::Material;
-use tracer::sphere::{Sphere};
+use tracer::plane::Plane;
+use tracer::sphere::Sphere;
 use tracer::lights::PointLight;
-use tracer::transforms::{rotation_x, rotation_y, scaling, translation, view_transform, shearing};
-use tracer::world::World;
+use tracer::transforms::{scaling, translation, view_transform, shearing};
+use tracer::world::{World, ShapeEnum};
 use tracer::{point, Color, vector};
 use tracer::camera::Camera;
 
 fn main() -> Result<(), &'static str> {
-    // Flatenned sphere
-    let mut floor = Sphere::default();
-    floor.transform = scaling(10., 0.01, 10.);
-    floor.material = Material::default();
-    floor.material.color = Color::new(1., 0.9, 0.9);
-    floor.material.specular = 0.;
-
-    // Left wall sphere
-    let mut left_wall = Sphere::default();
-    left_wall.transform = translation(0., 0., 5.)
-        * rotation_y(-PI / 4.)
-        * rotation_x(PI / 2.)
-        * scaling(10., 0.01, 10.);
-    left_wall.material = floor.material;
-
-    // Right wall sphere
-    let mut right_wall = Sphere::default();
-    right_wall.transform = translation(0., 0., 5.)
-        * rotation_y(PI / 4.)
-        * rotation_x(PI / 2.)
-        * scaling(10., 0.01, 10.);
-    right_wall.material = floor.material;
-
     let mut middle = Sphere::default();
     middle.transform = translation(-0.5, 1., 0.5);
     middle.material = Material::default();
@@ -56,16 +34,11 @@ fn main() -> Result<(), &'static str> {
     left.material.diffuse = 0.7;
     left.material.specular = 1.;
 
-    let mut other = Sphere::default();
-    other.transform = shearing(0.5, -0.5, 0., 0., -0.5, -0.5) * translation(0., 0., 0.);
-    other.material = Material::default();
-    other.material.color = Color::new(0.4, 0.4, 0.2);
-    other.material.diffuse = 0.2;
-    other.material.specular = 150.;
-
+    let mut floor = Plane::default();
+    floor.transform = translation(0., 0., -0.75);
 
     let mut world = World::default();
-    world.objects = vec![floor, left_wall, right_wall, middle, right, left, other];
+    world.objects = vec![ShapeEnum::Sphere(middle), ShapeEnum::Sphere(right), ShapeEnum::Sphere(left), ShapeEnum::Plane(floor)];
     world.light = Some(PointLight::new(point(-10., 10., -10.), Color::new(1., 1., 1.)));
     let mut camera = Camera::new(500, 250, PI / 3.);
     camera.transform = view_transform(point(0., 1.5, -5.), point(0., 1., 0.), vector(0., 1., 0.));

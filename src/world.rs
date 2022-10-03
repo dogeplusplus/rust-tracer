@@ -77,7 +77,7 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
 pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
-        _ => panic!("Cannot intersect world with object"),
+        ShapeEnum::Plane(plane) => plane.material,
     };
 
     lighting(
@@ -93,8 +93,6 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
 pub fn color_at(world: &World, ray: Ray) -> Color {
     let intersections = intersect_world(world, ray);
     let hits = hit(intersections);
-
-    println!("{:?}", hits);
 
     if hits.is_none() {
         return Color::new(0., 0., 0.);
