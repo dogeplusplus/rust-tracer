@@ -2,6 +2,7 @@ use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrix::Matrix;
 use crate::ray::Ray;
+use crate::world::ShapeEnum;
 use crate::{dot, normalize, point, Tuple};
 use crate::shape::Shape;
 
@@ -44,7 +45,7 @@ impl Shape for Sphere {
         } else {
             let t1 = (-b - f32::sqrt(discriminant)) / (2. * a);
             let t2 = (-b + f32::sqrt(discriminant)) / (2. * a);
-            vec![Intersection::new(t1, *self), Intersection::new(t2, *self)]
+            vec![Intersection::new(t1, ShapeEnum::Sphere(*self)), Intersection::new(t2, ShapeEnum::Sphere(*self))]
         }
     }
 

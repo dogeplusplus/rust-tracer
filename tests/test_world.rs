@@ -10,7 +10,7 @@ mod tests {
         sphere::Sphere,
         transforms::{scaling, translation},
         vector,
-        world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed},
+        world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed, ShapeEnum},
         Color,
     };
 
@@ -36,8 +36,8 @@ mod tests {
 
         let w = World::default();
         assert_eq!(w.light.unwrap(), light);
-        assert!(contains(&w, s1));
-        assert!(contains(&w, s2));
+        assert!(contains(&w, ShapeEnum::Sphere(s1)));
+        assert!(contains(&w, ShapeEnum::Sphere(s2)));
     }
 
     #[test]
@@ -96,11 +96,27 @@ mod tests {
     fn test_intersection_behind_ray() {
         let mut w = World::default();
 
-        w.objects[0].material.ambient = 1.;
-        w.objects[1].material.ambient = 1.;
+        match w.objects[0] {
+            ShapeEnum::Sphere(ref mut sphere) => {
+                sphere.material.ambient = 1.
+            },
+            _ => panic!("Shape is not a sphere"),
+        }
+        match w.objects[1] {
+            ShapeEnum::Sphere(ref mut sphere) => {
+                sphere.material.ambient = 1.
+            },
+            _ => panic!("Shape is not a sphere"),
+        }
         let r = Ray::new(point(0., 0., 0.75), vector(0., 0., -1.));
         let c = color_at(&w, r);
-        assert_eq!(c, w.objects[1].material.color);
+
+        match w.objects[1] {
+            ShapeEnum::Sphere(sphere) => {
+                assert_eq!(c, sphere.material.color);
+            },
+            _ => panic!("Shape is not a sphere"),
+        }
     }
 
     #[test]
@@ -138,9 +154,9 @@ mod tests {
         let s1 = Sphere::default();
         let mut s2 = Sphere::default();
         s2.set_transform(translation(0., 0., 10.));
-        w.objects = vec![s1, s2];
+        w.objects = vec![ShapeEnum::Sphere(s1), ShapeEnum::Sphere(s2)];
         let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
-        let i = Intersection::new(4., s2);
+        let i = Intersection::new(4., ShapeEnum::Sphere(s2));
         let comps = prepare_computations(i, r);
         let c = shade_hit(&w, comps);
         assert_eq!(c, Color::new(0.1, 0.1, 0.1));
@@ -151,7 +167,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut shape = Sphere::default();
         shape.set_transform(translation(0., 0., 1.));
-        let i = Intersection::new(5., shape);
+        let i = Intersection::new(5., ShapeEnum::Sphere(shape));
         let comps = prepare_computations(i, r);
         assert!(comps.over_point.z < -f32::EPSILON / 2.);
         assert!(comps.point.z > comps.over_point.z)
