@@ -2,21 +2,22 @@ mod tests {
     use tracer::intersections::{hit, prepare_computations, Intersection};
     use tracer::ray::Ray;
     use tracer::sphere::Sphere;
+    use tracer::world::ShapeEnum;
     use tracer::{point, vector};
 
     #[test]
     fn test_intersection() {
         let s = Sphere::default();
-        let i = Intersection::new(3.5, s);
+        let i = Intersection::new(3.5, ShapeEnum::Sphere(s));
         assert_eq!(i.t, 3.5);
-        assert_eq!(i.object, s);
+        assert_eq!(i.object, ShapeEnum::Sphere(s));
     }
 
     #[test]
     fn test_intersections() {
         let s = Sphere::default();
-        let i1 = Intersection::new(1., s);
-        let i2 = Intersection::new(2., s);
+        let i1 = Intersection::new(1., ShapeEnum::Sphere(s));
+        let i2 = Intersection::new(2., ShapeEnum::Sphere(s));
         let xs = vec![i1, i2];
 
         assert_eq!(xs.len(), 2);
@@ -27,8 +28,8 @@ mod tests {
     #[test]
     fn test_hit_positive() {
         let s = Sphere::default();
-        let i1 = Intersection::new(1., s);
-        let i2 = Intersection::new(2., s);
+        let i1 = Intersection::new(1., ShapeEnum::Sphere(s));
+        let i2 = Intersection::new(2., ShapeEnum::Sphere(s));
         let xs = vec![i1, i2];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i1);
@@ -37,8 +38,8 @@ mod tests {
     #[test]
     fn test_hit_some_negative() {
         let s = Sphere::default();
-        let i1 = Intersection::new(-1., s);
-        let i2 = Intersection::new(1., s);
+        let i1 = Intersection::new(-1., ShapeEnum::Sphere(s));
+        let i2 = Intersection::new(1., ShapeEnum::Sphere(s));
         let xs = vec![i1, i2];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i2);
@@ -47,8 +48,8 @@ mod tests {
     #[test]
     fn test_all_negative() {
         let s = Sphere::default();
-        let i1 = Intersection::new(-2., s);
-        let i2 = Intersection::new(-1., s);
+        let i1 = Intersection::new(-2., ShapeEnum::Sphere(s));
+        let i2 = Intersection::new(-1., ShapeEnum::Sphere(s));
         let xs = vec![i1, i2];
         let i = hit(xs);
         assert!(i.is_none());
@@ -57,10 +58,10 @@ mod tests {
     #[test]
     fn test_first_hit_nonnegative() {
         let s = Sphere::default();
-        let i1 = Intersection::new(5., s);
-        let i2 = Intersection::new(7., s);
-        let i3 = Intersection::new(-3., s);
-        let i4 = Intersection::new(2., s);
+        let i1 = Intersection::new(5., ShapeEnum::Sphere(s));
+        let i2 = Intersection::new(7., ShapeEnum::Sphere(s));
+        let i3 = Intersection::new(-3., ShapeEnum::Sphere(s));
+        let i4 = Intersection::new(2., ShapeEnum::Sphere(s));
         let xs = vec![i1, i2, i3, i4];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i4);
@@ -70,7 +71,7 @@ mod tests {
     fn test_precompute_intersection_state() {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
-        let i = Intersection::new(4., shape);
+        let i = Intersection::new(4., ShapeEnum::Sphere(shape));
         let comps = prepare_computations(i, r);
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.object, i.object);
@@ -83,7 +84,7 @@ mod tests {
     fn test_hit_outside() {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
-        let i = Intersection::new(4., shape);
+        let i = Intersection::new(4., ShapeEnum::Sphere(shape));
         let comps = prepare_computations(i, r);
         assert!(!comps.inside);
     }
@@ -92,7 +93,7 @@ mod tests {
     fn test_hit_inside() {
         let r = Ray::new(point(0., 0., 0.), vector(0., 0., 1.));
         let shape = Sphere::default();
-        let i = Intersection::new(1., shape);
+        let i = Intersection::new(1., ShapeEnum::Sphere(shape));
         let comps = prepare_computations(i, r);
         assert_eq!(comps.point, point(0., 0., 1.));
         assert_eq!(comps.eyev, vector(0., 0., -1.));

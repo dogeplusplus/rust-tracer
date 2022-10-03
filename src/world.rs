@@ -64,7 +64,10 @@ pub fn contains(world: &World, object: ShapeEnum) -> bool {
 pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
     let mut intersections = Vec::new();
     for obj in &world.objects {
-        let obj_intersects = intersect(*obj, ray);
+        let obj_intersects = match *obj {
+            ShapeEnum::Plane(plane) => intersect(plane, ray),
+            ShapeEnum::Sphere(sphere) => intersect(sphere, ray),
+        };
         intersections.extend(obj_intersects);
     }
     intersections.sort_by(|&a, &b| (a.t).partial_cmp(&b.t).unwrap());
@@ -72,8 +75,13 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
 }
 
 pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
+    let material = match comps.object {
+        ShapeEnum::Sphere(sphere) => sphere.material,
+        _ => panic!("Cannot intersect world with object"),
+    };
+
     lighting(
-        comps.object.material,
+        material,
         world.light.unwrap(),
         comps.point,
         comps.eyev,
@@ -85,6 +93,8 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
 pub fn color_at(world: &World, ray: Ray) -> Color {
     let intersections = intersect_world(world, ray);
     let hits = hit(intersections);
+
+    println!("{:?}", hits);
 
     if hits.is_none() {
         return Color::new(0., 0., 0.);

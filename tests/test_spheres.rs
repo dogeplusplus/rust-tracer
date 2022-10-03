@@ -1,6 +1,7 @@
 mod tests {
     use std::f32::consts::PI;
 
+    use tracer::world::ShapeEnum;
     use tracer::materials::Material;
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
@@ -54,8 +55,8 @@ mod tests {
         let s = Sphere::default();
         let xs = s.local_intersect(r);
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].object, s);
-        assert_eq!(xs[1].object, s);
+        assert_eq!(xs[0].object, ShapeEnum::Sphere(s));
+        assert_eq!(xs[1].object, ShapeEnum::Sphere(s));
     }
 
     #[test]

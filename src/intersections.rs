@@ -48,10 +48,9 @@ pub struct Precomputation {
 pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
     let pos = position(ray, intersection.t);
     let mut normal = match intersection.object {
-        obj => normal_at(obj, pos);
-        _ => panic!();
-    }
-    // let mut normal = normal_at(intersection.object, pos);
+        ShapeEnum::Plane(plane) => normal_at(plane, pos),
+        ShapeEnum::Sphere(sphere) => normal_at(sphere, pos),
+    };
     let eye = -ray.direction;
     let mut inside = false;
     if dot(normal, eye) < 0. {
