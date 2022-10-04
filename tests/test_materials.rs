@@ -1,6 +1,7 @@
 mod tests {
     use tracer::lights::{lighting, PointLight};
     use tracer::materials::Material;
+    use tracer::patterns::stripe_pattern;
     use tracer::{point, vector, Color};
 
     #[test]
@@ -85,5 +86,26 @@ mod tests {
         let in_shadow = true;
         let result = lighting(m, light, position, eyev, normalv, in_shadow);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
+    }
+
+    #[test]
+    fn test_lighting_with_pattern() {
+        let mut m = Material::default();
+
+        let white = Color::new(1., 1., 1.);
+        let black = Color::new(0., 0., 0.);
+        m.pattern = Some(stripe_pattern(white, black));
+        m.ambient = 1.;
+        m.diffuse = 0.;
+        m.specular = 0.;
+        let eyev = vector(0., 0., -1.);
+        let normalv = vector(0., 0., -1.);
+        let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
+
+        let c1 = lighting(m, light, point(0.9, 0., 0.), eyev, normalv, false);
+        let c2 = lighting(m, light, point(1.1, 0., 0.), eyev, normalv, false);
+        assert_eq!(c1, white);
+        assert_eq!(c2, black);
+
     }
 }

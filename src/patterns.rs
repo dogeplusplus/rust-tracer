@@ -1,6 +1,6 @@
 use crate::{Color, Tuple};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Pattern {
     pub a: Color,
     pub b: Color,

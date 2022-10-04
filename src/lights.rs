@@ -1,4 +1,4 @@
-use crate::{dot, materials::Material, normalize, reflect, Color, Tuple};
+use crate::{dot, materials::Material, normalize, reflect, Color, Tuple, patterns::stripe_at};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct PointLight {
@@ -23,7 +23,12 @@ pub fn lighting(
     normalv: Tuple,
     in_shadow: bool,
 ) -> Color {
-    let effective_color = material.color * light.intensity;
+    let mut color = material.color;
+    if let Some(pattern) = material.pattern {
+        color = stripe_at(pattern, point);
+    }
+
+    let effective_color = color * light.intensity;
     let lightv = normalize(light.position - point);
     let ambient = effective_color * material.ambient;
     let black = Color::new(0., 0., 0.);
