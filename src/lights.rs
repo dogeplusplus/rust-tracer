@@ -1,4 +1,7 @@
-use crate::{dot, materials::Material, normalize, reflect, Color, Tuple, patterns::stripe_at};
+use crate::{
+    dot, materials::Material, normalize, patterns::stripe_at_object, reflect, world::ShapeEnum,
+    Color, Tuple,
+};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct PointLight {
@@ -17,6 +20,7 @@ impl PointLight {
 
 pub fn lighting(
     material: Material,
+    object: ShapeEnum,
     light: PointLight,
     point: Tuple,
     eyev: Tuple,
@@ -25,7 +29,7 @@ pub fn lighting(
 ) -> Color {
     let mut color = material.color;
     if let Some(pattern) = material.pattern {
-        color = stripe_at(pattern, point);
+        color = stripe_at_object(pattern, object, point);
     }
 
     let effective_color = color * light.intensity;

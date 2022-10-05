@@ -2,6 +2,8 @@ mod tests {
     use tracer::lights::{lighting, PointLight};
     use tracer::materials::Material;
     use tracer::patterns::stripe_pattern;
+    use tracer::sphere::Sphere;
+    use tracer::world::ShapeEnum;
     use tracer::{point, vector, Color};
 
     #[test]
@@ -18,33 +20,36 @@ mod tests {
     #[test]
     fn test_lighting_eye_between_surface_and_source() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let position = point(0., 0., 0.);
         let eyev = vector(0., 0., -1.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
-        let result = lighting(m, light, position, eyev, normalv, false);
+        let result = lighting(m, obj, light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(1.9, 1.9, 1.9));
     }
 
     #[test]
     fn test_lighting_eye_angle_45_surface() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let position = point(0., 0., 0.);
         let eyev = vector(0., f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
-        let result = lighting(m, light, position, eyev, normalv, false);
+        let result = lighting(m, obj, light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(1., 1., 1.));
     }
 
     #[test]
     fn test_lighting_angle_45_surface() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let position = point(0., 0., 0.);
         let eyev = vector(0., 0., -1.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 10., -10.), Color::new(1., 1., 1.));
-        let result = lighting(m, light, position, eyev, normalv, false);
+        let result = lighting(m, obj, light, position, eyev, normalv, false);
         let c = 0.1 + 0.9 * f32::sqrt(2.) / 2.;
         assert_eq!(result, Color::new(c, c, c));
     }
@@ -52,11 +57,12 @@ mod tests {
     #[test]
     fn test_eye_path_reflection_vector() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let position = point(0., 0., 0.);
         let eyev = vector(0., -f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 10., -10.), Color::new(1., 1., 1.));
-        let result = lighting(m, light, position, eyev, normalv, false);
+        let result = lighting(m, obj, light, position, eyev, normalv, false);
         let c = 0.1 + 0.9 * f32::sqrt(2.) / 2. + 0.9;
 
         // Precision seems to be quite low for the lighting calculation
@@ -68,29 +74,32 @@ mod tests {
     #[test]
     fn test_light_behind_surface() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let position = point(0., 0., 0.);
         let eyev = vector(0., 0., -1.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., 10.), Color::new(1., 1., 1.));
-        let result = lighting(m, light, position, eyev, normalv, false);
+        let result = lighting(m, obj, light, position, eyev, normalv, false);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
 
     #[test]
     fn test_lighting_surface_shadow() {
         let m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
         let eyev = vector(0., 0., -1.);
         let position = point(0., 0., 0.);
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
         let in_shadow = true;
-        let result = lighting(m, light, position, eyev, normalv, in_shadow);
+        let result = lighting(m, obj, light, position, eyev, normalv, in_shadow);
         assert_eq!(result, Color::new(0.1, 0.1, 0.1));
     }
 
     #[test]
     fn test_lighting_with_pattern() {
         let mut m = Material::default();
+        let obj = ShapeEnum::Sphere(Sphere::default());
 
         let white = Color::new(1., 1., 1.);
         let black = Color::new(0., 0., 0.);
@@ -102,10 +111,9 @@ mod tests {
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
 
-        let c1 = lighting(m, light, point(0.9, 0., 0.), eyev, normalv, false);
-        let c2 = lighting(m, light, point(1.1, 0., 0.), eyev, normalv, false);
+        let c1 = lighting(m, obj, light, point(0.9, 0., 0.), eyev, normalv, false);
+        let c2 = lighting(m, obj, light, point(1.1, 0., 0.), eyev, normalv, false);
         assert_eq!(c1, white);
         assert_eq!(c2, black);
-
     }
 }

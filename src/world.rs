@@ -82,6 +82,7 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
 
     lighting(
         material,
+        comps.object,
         world.light.unwrap(),
         comps.point,
         comps.eyev,
