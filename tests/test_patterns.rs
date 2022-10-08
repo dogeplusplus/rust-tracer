@@ -5,7 +5,7 @@ mod tests {
     use tracer::transforms::{scaling, translation};
     use tracer::world::ShapeEnum;
     use tracer::{Color, point};
-    use tracer::patterns::{Pattern,pattern_at_shape,PatternType, StripePattern};
+    use tracer::patterns::{Pattern,pattern_at_shape,PatternType, StripePattern, GradientPattern};
 
     #[test]
     fn test_make_stripe_pattern() {
@@ -101,5 +101,17 @@ mod tests {
         pattern.set_transform(translation(0.5, 1., 1.5));
         let c = pattern_at_shape(pattern, object, point(2.5, 3., 3.5));
         assert_eq!(c, Color::new(0.75, 0.5, 0.25));
+    }
+
+    #[test]
+    fn test_gradient_pattern() {
+        let black = Color::new(0., 0., 0.);
+        let white = Color::new(1., 1., 1.);
+        let pattern = GradientPattern::new(white, black);
+    
+        assert_eq!(pattern.pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.pattern_at(point(0.25, 0., 0.)), Color::new(0.75, 0.75, 0.75));
+        assert_eq!(pattern.pattern_at(point(0.5, 0., 0.)), Color::new(0.5, 0.5, 0.5));
+        assert_eq!(pattern.pattern_at(point(0.75, 0., 0.)), Color::new(0.25, 0.25, 0.25));
     }
 }

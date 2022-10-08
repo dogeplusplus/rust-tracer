@@ -45,7 +45,7 @@ pub struct StripePattern {
 
 impl StripePattern {
     pub fn new(a: Color, b: Color) -> Self {
-        StripePattern { a, b }
+        Self { a, b }
     }
 
     pub fn pattern_at(&self, point: Tuple) -> Color {
@@ -54,6 +54,23 @@ impl StripePattern {
         } else {
             self.b
         }
+    }
+}
+
+pub struct GradientPattern {
+    pub a: Color,
+    pub b: Color,
+}
+
+impl GradientPattern {
+    pub fn new(a: Color, b: Color) -> Self {
+        Self { a, b }
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Color {
+        let distance = self.b - self.a;
+        let fraction = point.x - f32::floor(point.x);
+        self.a + distance * fraction
     }
 }
 
