@@ -1,5 +1,5 @@
 use crate::{
-    dot, materials::Material, normalize, patterns::stripe_at_object, reflect, world::ShapeEnum,
+    dot, materials::Material, normalize, patterns::pattern_at_shape, reflect, world::ShapeEnum,
     Color, Tuple,
 };
 
@@ -29,7 +29,7 @@ pub fn lighting(
 ) -> Color {
     let mut color = material.color;
     if let Some(pattern) = material.pattern {
-        color = stripe_at_object(pattern, object, point);
+        color = pattern_at_shape(pattern, object, point);
     }
 
     let effective_color = color * light.intensity;

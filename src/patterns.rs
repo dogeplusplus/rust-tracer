@@ -1,45 +1,69 @@
-use crate::{Color, Tuple, world::ShapeEnum, matrix::Matrix};
+use crate::{Color, Tuple, matrix::Matrix, world::ShapeEnum};
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PatternType {
+    Stripe(StripePattern),
+    Test(),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Pattern {
-    pub a: Color,
-    pub b: Color,
+    pattern: PatternType,
     pub transform: Matrix<f32, 4, 4>,
 }
 
+
 impl Pattern {
+    pub fn new(pattern: PatternType) -> Self {
+        let transform = Matrix::new([
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.],
+        ]);
+        Pattern{pattern, transform}
+    }
+
     pub fn set_transform(&mut self, transform: Matrix<f32, 4, 4>) {
         self.transform = transform;
     }
-}
 
-pub fn stripe_pattern(a: Color, b: Color) -> Pattern {
-    let transform = Matrix::new([
-        [1., 0., 0., 0.],
-        [0., 1., 0., 0.],
-        [0., 0., 1., 0.],
-        [0., 0., 0., 1.],
-    ]);
-    Pattern { a, b, transform }
-}
-
-pub fn stripe_at(pattern: Pattern, point: Tuple) -> Color {
-    if f32::floor(point.x) as i32 % 2 == 0 {
-        pattern.a
-    } else {
-        pattern.b
+    pub fn pattern_at(&mut self, point: Tuple) -> Color {
+        Color::new(point.x, point.y, point.z)
     }
 }
 
-pub fn stripe_at_object(pattern: Pattern, shape: ShapeEnum, point: Tuple) -> Color {
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct TestPattern {
+}
 
-    let shape_invert = match shape {
-        ShapeEnum::Sphere(sphere) => sphere.transform.inverse().unwrap(),
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub struct StripePattern {
+    pub a: Color,
+    pub b: Color,
+}
+
+impl StripePattern {
+    pub fn new(a: Color, b: Color) -> Self {
+        StripePattern { a, b }
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Color {
+        if f32::floor(point.x) as i32 % 2 == 0 {
+            self.a
+        } else {
+            self.b
+        }
+    }
+}
+
+pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) -> Color {
+    let pattern_inv = pattern.transform.inverse().unwrap();
+    let shape_inv = match shape {
         ShapeEnum::Plane(plane) => plane.transform.inverse().unwrap(),
-    };
-
-    let obj_point = shape_invert * point;
-    let pattern_point = pattern.transform.inverse().unwrap() * obj_point;
-
-    stripe_at(pattern, pattern_point)
+        ShapeEnum::Sphere(sphere) => sphere.transform.inverse().unwrap(),
+    } ;
+    let world_point = shape_inv * point;
+    let pattern_point = pattern_inv * world_point;
+    pattern.pattern_at(pattern_point)
 }
