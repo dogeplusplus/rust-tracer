@@ -1,10 +1,10 @@
+use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrix::Matrix;
+use crate::ray::Ray;
+use crate::shape::Shape;
 use crate::world::ShapeEnum;
 use crate::Tuple;
-use crate::shape::Shape;
-use crate::intersections::Intersection;
-use crate::ray::Ray;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Plane {
@@ -20,7 +20,7 @@ impl Default for Plane {
             [0., 0., 1., 0.],
             [0., 0., 0., 1.],
         ]);
-        
+
         let mater = Material::default();
         Plane {
             transform: identity,

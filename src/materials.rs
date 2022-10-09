@@ -1,4 +1,4 @@
-use crate::{Color, patterns::Pattern};
+use crate::{patterns::Pattern, Color};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Material {

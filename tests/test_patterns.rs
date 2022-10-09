@@ -1,11 +1,14 @@
 mod tests {
     use tracer::matrix::Matrix;
+    use tracer::patterns::{
+        pattern_at_shape, CheckerPattern, GradientPattern, Pattern, PatternType, RingPattern,
+        StripePattern,
+    };
     use tracer::shape::Shape;
     use tracer::sphere::Sphere;
     use tracer::transforms::{scaling, translation};
     use tracer::world::ShapeEnum;
-    use tracer::{Color, point};
-    use tracer::patterns::{Pattern,pattern_at_shape,PatternType, StripePattern, GradientPattern};
+    use tracer::{point, Color};
 
     #[test]
     fn test_make_stripe_pattern() {
@@ -42,10 +45,10 @@ mod tests {
         let black = Color::new(0., 0., 0.);
         let white = Color::new(1., 1., 1.);
         let pattern = StripePattern::new(white, black);
-        
-        assert_eq!(pattern.pattern_at(point(0., 0., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(0., 1., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(0., 2., 0.)), white);
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 1., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 2., 0.)), white);
     }
 
     #[test]
@@ -53,10 +56,10 @@ mod tests {
         let black = Color::new(0., 0., 0.);
         let white = Color::new(1., 1., 1.);
         let pattern = StripePattern::new(white, black);
-        
-        assert_eq!(pattern.pattern_at(point(0., 0., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(0., 0., 1.)), white);
-        assert_eq!(pattern.pattern_at(point(0., 0., 2.)), white);
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 1.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 2.)), white);
     }
 
     #[test]
@@ -65,12 +68,12 @@ mod tests {
         let white = Color::new(1., 1., 1.);
         let pattern = StripePattern::new(white, black);
 
-        assert_eq!(pattern.pattern_at(point(0., 0., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(0.9, 0., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(1., 0., 0.)), black);
-        assert_eq!(pattern.pattern_at(point(-0.1, 0., 0.)), black);
-        assert_eq!(pattern.pattern_at(point(-1., 0., 0.)), black);
-        assert_eq!(pattern.pattern_at(point(-1.1, 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0.9, 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(1., 0., 0.)), black);
+        assert_eq!(pattern.local_pattern_at(point(-0.1, 0., 0.)), black);
+        assert_eq!(pattern.local_pattern_at(point(-1., 0., 0.)), black);
+        assert_eq!(pattern.local_pattern_at(point(-1.1, 0., 0.)), white);
     }
 
     #[test]
@@ -108,10 +111,51 @@ mod tests {
         let black = Color::new(0., 0., 0.);
         let white = Color::new(1., 1., 1.);
         let pattern = GradientPattern::new(white, black);
-    
-        assert_eq!(pattern.pattern_at(point(0., 0., 0.)), white);
-        assert_eq!(pattern.pattern_at(point(0.25, 0., 0.)), Color::new(0.75, 0.75, 0.75));
-        assert_eq!(pattern.pattern_at(point(0.5, 0., 0.)), Color::new(0.5, 0.5, 0.5));
-        assert_eq!(pattern.pattern_at(point(0.75, 0., 0.)), Color::new(0.25, 0.25, 0.25));
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(
+            pattern.local_pattern_at(point(0.25, 0., 0.)),
+            Color::new(0.75, 0.75, 0.75)
+        );
+        assert_eq!(
+            pattern.local_pattern_at(point(0.5, 0., 0.)),
+            Color::new(0.5, 0.5, 0.5)
+        );
+        assert_eq!(
+            pattern.local_pattern_at(point(0.75, 0., 0.)),
+            Color::new(0.25, 0.25, 0.25)
+        );
+    }
+
+    #[test]
+    fn test_ring_pattern() {
+        let black = Color::new(0., 0., 0.);
+        let white = Color::new(1., 1., 1.);
+        let pattern = RingPattern::new(white, black);
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(1., 0., 0.)), black);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 1.)), black);
+        assert_eq!(pattern.local_pattern_at(point(0.708, 0., 0.708)), black);
+    }
+
+    #[test]
+    fn test_checker_pattern() {
+        let black = Color::new(0., 0., 0.);
+        let white = Color::new(1., 1., 1.);
+        let pattern = CheckerPattern::new(white, black);
+
+        // test repeat in x, y and z
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0.99, 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(1.01, 0., 0.)), black);
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0.99, 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 1.01, 0.)), black);
+
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.99)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 1.01)), black);
     }
 }

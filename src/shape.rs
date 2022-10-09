@@ -1,8 +1,14 @@
-use crate::{Tuple, normalize};
-use crate::{intersections::Intersection, ray::{Ray, transform}, matrix::Matrix};
+use crate::{
+    intersections::Intersection,
+    matrix::Matrix,
+    ray::{transform, Ray},
+};
+use crate::{normalize, Tuple};
 
 pub trait Shape {
-    fn local_intersect(&self, ray: Ray) -> Vec<Intersection> where Self: Sized;
+    fn local_intersect(&self, ray: Ray) -> Vec<Intersection>
+    where
+        Self: Sized;
     fn get_transform(&self) -> Matrix<f32, 4, 4>;
     fn set_transform(&mut self, transform: Matrix<f32, 4, 4>);
     fn local_normal_at(&self, point: Tuple) -> Tuple;

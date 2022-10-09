@@ -1,13 +1,13 @@
 mod tests {
     use std::f32::consts::PI;
 
-    use tracer::world::ShapeEnum;
     use tracer::materials::Material;
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
-    use tracer::shape::{Shape,normal_at, intersect};
+    use tracer::shape::{intersect, normal_at, Shape};
     use tracer::sphere::Sphere;
     use tracer::transforms::{rotation_z, scaling, translation};
+    use tracer::world::ShapeEnum;
     use tracer::{magnitude, normalize, point, vector};
 
     #[test]

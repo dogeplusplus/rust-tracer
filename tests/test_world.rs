@@ -10,7 +10,7 @@ mod tests {
         sphere::Sphere,
         transforms::{scaling, translation},
         vector,
-        world::{color_at, contains, intersect_world, shade_hit, World, is_shadowed, ShapeEnum},
+        world::{color_at, contains, intersect_world, is_shadowed, shade_hit, ShapeEnum, World},
         Color,
     };
 
@@ -97,15 +97,11 @@ mod tests {
         let mut w = World::default();
 
         match w.objects[0] {
-            ShapeEnum::Sphere(ref mut sphere) => {
-                sphere.material.ambient = 1.
-            },
+            ShapeEnum::Sphere(ref mut sphere) => sphere.material.ambient = 1.,
             _ => panic!("Shape is not a sphere"),
         }
         match w.objects[1] {
-            ShapeEnum::Sphere(ref mut sphere) => {
-                sphere.material.ambient = 1.
-            },
+            ShapeEnum::Sphere(ref mut sphere) => sphere.material.ambient = 1.,
             _ => panic!("Shape is not a sphere"),
         }
         let r = Ray::new(point(0., 0., 0.75), vector(0., 0., -1.));
@@ -114,7 +110,7 @@ mod tests {
         match w.objects[1] {
             ShapeEnum::Sphere(sphere) => {
                 assert_eq!(c, sphere.material.color);
-            },
+            }
             _ => panic!("Shape is not a sphere"),
         }
     }

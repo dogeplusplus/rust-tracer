@@ -9,13 +9,13 @@ pub mod intersections;
 pub mod lights;
 pub mod materials;
 pub mod matrix;
+pub mod patterns;
+pub mod plane;
 pub mod ray;
 pub mod shape;
 pub mod sphere;
 pub mod transforms;
 pub mod world;
-pub mod plane;
-pub mod patterns;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

@@ -1,7 +1,7 @@
 mod tests {
     use tracer::lights::{lighting, PointLight};
     use tracer::materials::Material;
-    use tracer::patterns::stripe_pattern;
+    use tracer::patterns::{Pattern, PatternType, StripePattern};
     use tracer::sphere::Sphere;
     use tracer::world::ShapeEnum;
     use tracer::{point, vector, Color};
@@ -103,7 +103,9 @@ mod tests {
 
         let white = Color::new(1., 1., 1.);
         let black = Color::new(0., 0., 0.);
-        m.pattern = Some(stripe_pattern(white, black));
+        m.pattern = Some(Pattern::new(PatternType::Stripe(StripePattern::new(
+            white, black,
+        ))));
         m.ambient = 1.;
         m.diffuse = 0.;
         m.specular = 0.;

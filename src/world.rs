@@ -1,15 +1,17 @@
 use crate::{
     intersections::{hit, prepare_computations, Intersection, Precomputation},
     lights::{lighting, PointLight},
+    magnitude,
     materials::Material,
+    normalize,
+    plane::Plane,
     point,
     ray::Ray,
     shape::intersect,
     sphere::Sphere,
     transforms::scaling,
-    Color, Tuple, magnitude, normalize, plane::Plane,
+    Color, Tuple,
 };
-
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ShapeEnum {
@@ -102,7 +104,6 @@ pub fn color_at(world: &World, ray: Ray) -> Color {
     let comps = prepare_computations(hits.unwrap(), ray);
     shade_hit(world, comps)
 }
-
 
 pub fn is_shadowed(world: &World, point: Tuple) -> bool {
     if let Some(light) = world.light {

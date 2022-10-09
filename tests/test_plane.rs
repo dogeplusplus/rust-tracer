@@ -1,7 +1,7 @@
 mod tests {
     use tracer::shape::Shape;
     use tracer::world::ShapeEnum;
-    use tracer::{plane::Plane, point, vector, ray::Ray};
+    use tracer::{plane::Plane, point, ray::Ray, vector};
 
     #[test]
     fn test_normal_plane_constant() {

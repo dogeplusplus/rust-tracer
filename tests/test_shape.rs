@@ -1,13 +1,13 @@
 mod tests {
     use std::f32::consts::PI;
 
-    use tracer::ray::Ray;
-    use tracer::matrix::Matrix;
     use tracer::materials::Material;
-    use tracer::{point, vector};
-    use tracer::transforms::{translation, scaling, rotation_z};
-    use tracer::shape::{Shape, intersect, normal_at};
+    use tracer::matrix::Matrix;
+    use tracer::ray::Ray;
+    use tracer::shape::{intersect, normal_at, Shape};
+    use tracer::transforms::{rotation_z, scaling, translation};
     use tracer::Tuple;
+    use tracer::{point, vector};
 
     #[derive(Clone, Copy)]
     struct TestShape {
@@ -23,13 +23,13 @@ mod tests {
                 [0., 0., 1., 0.],
                 [0., 0., 0., 1.],
             ]);
-            TestShape { 
+            TestShape {
                 material: Material::default(),
                 saved_ray: Ray {
                     origin: point(0., 0., 0.),
                     direction: vector(0., 0., 0.),
                 },
-                transform: identity,  
+                transform: identity,
             }
         }
     }
@@ -62,7 +62,7 @@ mod tests {
         let s = TestShape::new();
         assert_eq!(s.get_transform(), identity);
     }
-    
+
     #[test]
     fn test_set_transformation() {
         let mut s = TestShape::new();
@@ -75,7 +75,6 @@ mod tests {
         let s = TestShape::new();
         let m = s.material;
         assert_eq!(m, Material::default());
-        
     }
 
     #[test]
@@ -125,5 +124,4 @@ mod tests {
         let n = normal_at(s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
         assert_eq!(n, vector(-0.000000020444226, 0.97014254, -0.24253564));
     }
-
 }

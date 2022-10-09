@@ -2,8 +2,8 @@ use crate::{
     dot,
     ray::{position, Ray},
     shape::normal_at,
-    Tuple,
     world::ShapeEnum,
+    Tuple,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]

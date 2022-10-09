@@ -1,8 +1,11 @@
-use crate::{Color, Tuple, matrix::Matrix, world::ShapeEnum};
+use crate::{matrix::Matrix, world::ShapeEnum, Color, Tuple};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PatternType {
+    Ring(RingPattern),
+    Gradient(GradientPattern),
     Stripe(StripePattern),
+    Checker(CheckerPattern),
     Test(),
 }
 
@@ -12,7 +15,6 @@ pub struct Pattern {
     pub transform: Matrix<f32, 4, 4>,
 }
 
-
 impl Pattern {
     pub fn new(pattern: PatternType) -> Self {
         let transform = Matrix::new([
@@ -21,7 +23,7 @@ impl Pattern {
             [0., 0., 1., 0.],
             [0., 0., 0., 1.],
         ]);
-        Pattern{pattern, transform}
+        Pattern { pattern, transform }
     }
 
     pub fn set_transform(&mut self, transform: Matrix<f32, 4, 4>) {
@@ -29,13 +31,18 @@ impl Pattern {
     }
 
     pub fn pattern_at(&mut self, point: Tuple) -> Color {
-        Color::new(point.x, point.y, point.z)
+        match self.pattern {
+            PatternType::Gradient(grad) => grad.local_pattern_at(point),
+            PatternType::Stripe(stripe) => stripe.local_pattern_at(point),
+            PatternType::Checker(checker) => checker.local_pattern_at(point),
+            PatternType::Ring(ring) => ring.local_pattern_at(point),
+            PatternType::Test() => Color::new(point.x, point.y, point.z),
+        }
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-struct TestPattern {
-}
+struct TestPattern {}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct StripePattern {
@@ -48,7 +55,7 @@ impl StripePattern {
         Self { a, b }
     }
 
-    pub fn pattern_at(&self, point: Tuple) -> Color {
+    pub fn local_pattern_at(&self, point: Tuple) -> Color {
         if f32::floor(point.x) as i32 % 2 == 0 {
             self.a
         } else {
@@ -57,6 +64,7 @@ impl StripePattern {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct GradientPattern {
     pub a: Color,
     pub b: Color,
@@ -67,10 +75,50 @@ impl GradientPattern {
         Self { a, b }
     }
 
-    pub fn pattern_at(&self, point: Tuple) -> Color {
+    pub fn local_pattern_at(&self, point: Tuple) -> Color {
         let distance = self.b - self.a;
         let fraction = point.x - f32::floor(point.x);
         self.a + distance * fraction
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RingPattern {
+    pub a: Color,
+    pub b: Color,
+}
+
+impl RingPattern {
+    pub fn new(a: Color, b: Color) -> Self {
+        Self { a, b }
+    }
+
+    pub fn local_pattern_at(&self, point: Tuple) -> Color {
+        if (f32::floor(f32::sqrt(point.x * point.x + point.z * point.z)) as i32) % 2 == 0 {
+            self.a
+        } else {
+            self.b
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CheckerPattern {
+    pub a: Color,
+    pub b: Color,
+}
+
+impl CheckerPattern {
+    pub fn new(a: Color, b: Color) -> Self {
+        Self { a, b }
+    }
+
+    pub fn local_pattern_at(&self, point: Tuple) -> Color {
+        if (f32::floor(point.x) + f32::floor(point.y) + f32::floor(point.z)) as i32 % 2 == 0 {
+            self.a
+        } else {
+            self.b
+        }
     }
 }
 
@@ -79,7 +127,7 @@ pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) ->
     let shape_inv = match shape {
         ShapeEnum::Plane(plane) => plane.transform.inverse().unwrap(),
         ShapeEnum::Sphere(sphere) => sphere.transform.inverse().unwrap(),
-    } ;
+    };
     let world_point = shape_inv * point;
     let pattern_point = pattern_inv * world_point;
     pattern.pattern_at(pattern_point)
