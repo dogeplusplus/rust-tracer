@@ -31,7 +31,8 @@ impl Default for Plane {
 
 impl Shape for Plane {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
-        if ray.direction.y.abs() < f32::EPSILON {
+        let eps = 1e-3;
+        if ray.direction.y.abs() < eps {
             Vec::new()
         } else {
             let t = -ray.origin.y / ray.direction.y;

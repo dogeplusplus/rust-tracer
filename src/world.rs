@@ -86,7 +86,7 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
         material,
         comps.object,
         world.light.unwrap(),
-        comps.point,
+        comps.over_point,
         comps.eyev,
         comps.normalv,
         is_shadowed(world, comps.over_point),

@@ -58,7 +58,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         inside = true;
     }
     // Based on experiments, seems like this amount of perturbation is needed to avoid acne
-    let over_point = pos + normal * 1e-2;
+    let over_point = pos + normal * 1e-4;
 
     Precomputation {
         t: intersection.t,

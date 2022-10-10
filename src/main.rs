@@ -6,6 +6,7 @@ use tracer::camera::Camera;
 use tracer::canvas::canvas_to_ppm;
 use tracer::lights::PointLight;
 use tracer::materials::Material;
+use tracer::patterns::GradientPattern;
 use tracer::patterns::{CheckerPattern, Pattern, PatternType, RingPattern, StripePattern};
 use tracer::plane::Plane;
 use tracer::sphere::Sphere;
@@ -46,19 +47,29 @@ fn main() -> Result<(), &'static str> {
 
     let mut left = Sphere::default();
     left.transform = translation(-1.5, 0.33, -0.75)
-        * scaling(0.33, 0.33, 0.33)
+        * scaling(0.5, 0.5, 0.5)
         * shearing(0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
     left.material = Material::default();
     left.material.color = Color::new(0., 0.5, 0.9);
     left.material.diffuse = 0.7;
     left.material.specular = 1.;
 
+    let gradient = PatternType::Gradient(GradientPattern::new(
+        Color::new(1.0, 0.2, 0.),
+        Color::new(0., 0.2, 1.0),
+    ));
+    let mut gradient_pattern = Pattern::new(gradient);
+    gradient_pattern.set_transform(
+        shearing(0.5, 0.2, 1., 0., 0.2, 0.2)
+    );
+    left.material.pattern = Some(gradient_pattern);
+
     let mut floor = Plane::default();
     floor.transform = translation(0., 0., -0.75);
 
     let checker = PatternType::Checker(CheckerPattern::new(
-        Color::new(0.9, 0.0, 0.0),
-        Color::new(0.0, 0.9, 0.0),
+        Color::new(1., 1., 1.),
+        Color::new(0.0, 0.0, 0.0),
     ));
     floor.material.pattern = Some(Pattern::new(checker));
 
