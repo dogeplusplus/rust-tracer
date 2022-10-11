@@ -112,18 +112,18 @@ mod tests {
         let white = Color::new(1., 1., 1.);
         let pattern = GradientPattern::new(white, black);
 
-        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), Color::new(0.5, 0.5, 0.5));
         assert_eq!(
             pattern.local_pattern_at(point(0.25, 0., 0.)),
-            Color::new(0.75, 0.75, 0.75)
+            Color::new(0.375, 0.375, 0.375)
         );
         assert_eq!(
             pattern.local_pattern_at(point(0.5, 0., 0.)),
-            Color::new(0.5, 0.5, 0.5)
+            Color::new(0.25, 0.25, 0.25)
         );
         assert_eq!(
             pattern.local_pattern_at(point(0.75, 0., 0.)),
-            Color::new(0.25, 0.25, 0.25)
+            Color::new(0.125, 0.125, 0.125)
         );
     }
 

@@ -77,7 +77,8 @@ impl GradientPattern {
 
     pub fn local_pattern_at(&self, point: Tuple) -> Color {
         let distance = self.b - self.a;
-        let fraction = point.x - f32::floor(point.x);
+        // let fraction = point.x - f32::floor(point.x);
+        let fraction = (point.x + 1.) * 0.5;
         self.a + distance * fraction
     }
 }

@@ -27,7 +27,7 @@ fn main() -> Result<(), &'static str> {
         Color::new(0., 0.5, 0.5),
     ));
     let mut stripe_pattern = Pattern::new(stripe);
-    stripe_pattern.set_transform(scaling(0.3, 0.3, 0.3));
+    stripe_pattern.set_transform(scaling(2.3, 2.3, 2.3));
     middle.material.pattern = Some(Pattern::new(stripe));
 
     let mut right = Sphere::default();
@@ -46,9 +46,9 @@ fn main() -> Result<(), &'static str> {
     right.material.pattern = Some(ring_pattern);
 
     let mut left = Sphere::default();
-    left.transform = translation(-1.5, 0.33, -0.75)
+    left.transform = translation(-1., 1.5, -1.75)
         * scaling(0.5, 0.5, 0.5)
-        * shearing(0.5, 0.5, 0.5, 0.5, 0.5, 0.5);
+        * shearing(0.2, 0.2, 0.2, 0.2, 0.2, 0.2);
     left.material = Material::default();
     left.material.color = Color::new(0., 0.5, 0.9);
     left.material.diffuse = 0.7;
@@ -58,10 +58,7 @@ fn main() -> Result<(), &'static str> {
         Color::new(1.0, 0.2, 0.),
         Color::new(0., 0.2, 1.0),
     ));
-    let mut gradient_pattern = Pattern::new(gradient);
-    gradient_pattern.set_transform(
-        shearing(0.5, 0.2, 1., 0., 0.2, 0.2)
-    );
+    let gradient_pattern = Pattern::new(gradient);
     left.material.pattern = Some(gradient_pattern);
 
     let mut floor = Plane::default();
