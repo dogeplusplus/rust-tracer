@@ -2,7 +2,7 @@ mod tests {
     use tracer::matrix::Matrix;
     use tracer::patterns::{
         pattern_at_shape, CheckerPattern, GradientPattern, Pattern, PatternType, RingPattern,
-        StripePattern,
+        StripePattern, RadialGradient,
     };
     use tracer::shape::Shape;
     use tracer::sphere::Sphere;
@@ -112,18 +112,18 @@ mod tests {
         let white = Color::new(1., 1., 1.);
         let pattern = GradientPattern::new(white, black);
 
-        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), Color::new(0.5, 0.5, 0.5));
+        assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
         assert_eq!(
             pattern.local_pattern_at(point(0.25, 0., 0.)),
-            Color::new(0.375, 0.375, 0.375)
+            Color::new(0.75, 0.75, 0.75)
         );
         assert_eq!(
             pattern.local_pattern_at(point(0.5, 0., 0.)),
-            Color::new(0.25, 0.25, 0.25)
+            Color::new(0.5, 0.5, 0.5)
         );
         assert_eq!(
             pattern.local_pattern_at(point(0.75, 0., 0.)),
-            Color::new(0.125, 0.125, 0.125)
+            Color::new(0.25, 0.25, 0.25)
         );
     }
 
@@ -157,5 +157,16 @@ mod tests {
         assert_eq!(pattern.local_pattern_at(point(0., 0., 0.)), white);
         assert_eq!(pattern.local_pattern_at(point(0., 0., 0.99)), white);
         assert_eq!(pattern.local_pattern_at(point(0., 0., 1.01)), black);
+    }
+
+    #[test]
+    fn test_radial_gradient_pattern() {
+        let black = Color::new(0., 0., 0.);
+        let white = Color::new(1., 1., 1.);
+        let pattern = RadialGradient::new(white, black);
+
+        assert_eq!(pattern.local_pattern_at(point(1., 0., 0.)), white);
+        assert_eq!(pattern.local_pattern_at(point(0.5, 0., 0.)),
+            Color::new(0.5, 0.5, 0.5));
     }
 }

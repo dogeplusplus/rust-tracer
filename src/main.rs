@@ -7,6 +7,7 @@ use tracer::canvas::canvas_to_ppm;
 use tracer::lights::PointLight;
 use tracer::materials::Material;
 use tracer::patterns::GradientPattern;
+use tracer::patterns::RadialGradient;
 use tracer::patterns::{CheckerPattern, Pattern, PatternType, RingPattern, StripePattern};
 use tracer::plane::Plane;
 use tracer::sphere::Sphere;
@@ -22,13 +23,13 @@ fn main() -> Result<(), &'static str> {
     middle.material.diffuse = 0.7;
     middle.material.specular = 0.3;
 
-    let stripe = PatternType::Stripe(StripePattern::new(
+    let stripe = PatternType::Radial(RadialGradient::new(
         Color::new(1.0, 0.5, 0.0),
         Color::new(0., 0.5, 0.5),
     ));
     let mut stripe_pattern = Pattern::new(stripe);
-    stripe_pattern.set_transform(scaling(2.3, 2.3, 2.3));
-    middle.material.pattern = Some(Pattern::new(stripe));
+    stripe_pattern.set_transform(scaling(0.5, 0.5, 0.5));
+    middle.material.pattern = Some(stripe_pattern);
 
     let mut right = Sphere::default();
     right.transform = translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5);
@@ -46,7 +47,7 @@ fn main() -> Result<(), &'static str> {
     right.material.pattern = Some(ring_pattern);
 
     let mut left = Sphere::default();
-    left.transform = translation(-1., 1.5, -1.75)
+    left.transform = translation(-1., 0., -1.75)
         * scaling(0.5, 0.5, 0.5)
         * shearing(0.2, 0.2, 0.2, 0.2, 0.2, 0.2);
     left.material = Material::default();

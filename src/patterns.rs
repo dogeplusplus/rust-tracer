@@ -1,4 +1,4 @@
-use crate::{matrix::Matrix, world::ShapeEnum, Color, Tuple};
+use crate::{matrix::Matrix, world::ShapeEnum, Color, Tuple, normalize, magnitude};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PatternType {
@@ -6,6 +6,7 @@ pub enum PatternType {
     Gradient(GradientPattern),
     Stripe(StripePattern),
     Checker(CheckerPattern),
+    Radial(RadialGradient),
     Test(),
 }
 
@@ -36,6 +37,7 @@ impl Pattern {
             PatternType::Stripe(stripe) => stripe.local_pattern_at(point),
             PatternType::Checker(checker) => checker.local_pattern_at(point),
             PatternType::Ring(ring) => ring.local_pattern_at(point),
+            PatternType::Radial(radial) => radial.local_pattern_at(point),
             PatternType::Test() => Color::new(point.x, point.y, point.z),
         }
     }
@@ -77,8 +79,7 @@ impl GradientPattern {
 
     pub fn local_pattern_at(&self, point: Tuple) -> Color {
         let distance = self.b - self.a;
-        // let fraction = point.x - f32::floor(point.x);
-        let fraction = (point.x + 1.) * 0.5;
+        let fraction = point.x.abs() - point.x.abs().floor();
         self.a + distance * fraction
     }
 }
@@ -132,4 +133,24 @@ pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) ->
     let world_point = shape_inv * point;
     let pattern_point = pattern_inv * world_point;
     pattern.pattern_at(pattern_point)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct RadialGradient {
+    pub a: Color,
+    pub b: Color,
+}
+
+impl RadialGradient {
+    pub fn new(a: Color, b: Color) -> Self {
+        Self { a, b }
+    }
+
+    pub fn local_pattern_at(&self, point: Tuple) -> Color {
+        let distance = self.b - self.a;
+        let new = Tuple::new(point.x, point.y, point.z, 0.);
+        let m = magnitude(new);
+        let fraction = m - m.floor();
+        self.a + distance * fraction
+    }
 }
