@@ -1,9 +1,10 @@
 use crate::{
     dot,
     ray::{position, Ray},
+    reflect,
     shape::normal_at,
     world::ShapeEnum,
-    Tuple, reflect,
+    Tuple,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]

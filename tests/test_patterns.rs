@@ -1,8 +1,8 @@
 mod tests {
     use tracer::matrix::Matrix;
     use tracer::patterns::{
-        pattern_at_shape, CheckerPattern, GradientPattern, Pattern, PatternType, RingPattern,
-        StripePattern, RadialGradient,
+        pattern_at_shape, CheckerPattern, GradientPattern, Pattern, PatternType, RadialGradient,
+        RingPattern, StripePattern,
     };
     use tracer::shape::Shape;
     use tracer::sphere::Sphere;
@@ -166,7 +166,9 @@ mod tests {
         let pattern = RadialGradient::new(white, black);
 
         assert_eq!(pattern.local_pattern_at(point(1., 0., 0.)), white);
-        assert_eq!(pattern.local_pattern_at(point(0.5, 0., 0.)),
-            Color::new(0.5, 0.5, 0.5));
+        assert_eq!(
+            pattern.local_pattern_at(point(0.5, 0., 0.)),
+            Color::new(0.5, 0.5, 0.5)
+        );
     }
 }

@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::intersections::{Intersection, prepare_computations};
+    use tracer::intersections::{prepare_computations, Intersection};
     use tracer::lights::{lighting, PointLight};
     use tracer::materials::Material;
     use tracer::patterns::{Pattern, PatternType, StripePattern};
@@ -131,10 +131,16 @@ mod tests {
     #[test]
     fn test_precompute_reflection() {
         let shape = Plane::default();
-        let r = Ray::new(point(0., 1., -1.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let r = Ray::new(
+            point(0., 1., -1.),
+            vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
+        );
         let i = Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(shape));
         let comps = prepare_computations(i, r);
 
-        assert_eq!(comps.reflectv, vector(0., f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        assert_eq!(
+            comps.reflectv,
+            vector(0., f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.)
+        );
     }
 }

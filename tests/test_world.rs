@@ -4,14 +4,18 @@ mod tests {
         intersections::Intersection,
         lights::PointLight,
         materials::Material,
+        plane::Plane,
         point,
         ray::Ray,
         shape::Shape,
         sphere::Sphere,
         transforms::{scaling, translation},
         vector,
-        world::{color_at, contains, intersect_world, is_shadowed, shade_hit, ShapeEnum, World, reflected_color},
-        Color, plane::Plane,
+        world::{
+            color_at, contains, intersect_world, is_shadowed, reflected_color, shade_hit,
+            ShapeEnum, World,
+        },
+        Color,
     };
 
     #[test]
@@ -195,7 +199,10 @@ mod tests {
         });
         w.objects.push(shape);
 
-        let r = Ray::new(point(0., 0., -3.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let r = Ray::new(
+            point(0., 0., -3.),
+            vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
+        );
         let i = Intersection::new(f32::sqrt(2.), shape);
         let comps = prepare_computations(i, r);
         let color = reflected_color(&w, comps);
@@ -209,11 +216,14 @@ mod tests {
         material.reflective = 0.5;
         let shape = ShapeEnum::Plane(Plane {
             transform: translation(0., -1., 0.),
-            material
+            material,
         });
         w.objects.push(shape);
 
-        let r = Ray::new(point(0., 0., -3.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let r = Ray::new(
+            point(0., 0., -3.),
+            vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
+        );
         let i = Intersection::new(f32::sqrt(2.), shape);
         let comps = prepare_computations(i, r);
         let color = shade_hit(&w, comps);

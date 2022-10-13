@@ -140,6 +140,6 @@ pub fn reflected_color(w: &World, comps: Precomputation) -> Color {
 
     let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
     let color = color_at(&w, reflect_ray);
-    
+
     color * material.reflective
 }

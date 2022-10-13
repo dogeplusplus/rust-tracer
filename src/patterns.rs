@@ -1,4 +1,4 @@
-use crate::{matrix::Matrix, world::ShapeEnum, Color, Tuple, magnitude};
+use crate::{magnitude, matrix::Matrix, world::ShapeEnum, Color, Tuple};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PatternType {
