@@ -64,7 +64,7 @@ mod tests {
         let shape = w.objects[0];
         let i = Intersection::new(4., shape);
         let comps = prepare_computations(i, r);
-        let c = shade_hit(&w, comps);
+        let c = shade_hit(&w, comps, 5);
         assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855))
     }
 
@@ -76,7 +76,7 @@ mod tests {
         let shape = w.objects[1];
         let i = Intersection::new(0.5, shape);
         let comps = prepare_computations(i, r);
-        let c = shade_hit(&w, comps);
+        let c = shade_hit(&w, comps, 5);
         assert_eq!(c, Color::new(0.9049522, 0.9049522, 0.9049522));
     }
 
@@ -84,7 +84,7 @@ mod tests {
     fn test_intersect_world_ray_miss() {
         let w = World::default();
         let r = Ray::new(point(0., 0., -5.), vector(0., 1., 0.));
-        let c = color_at(&w, r);
+        let c = color_at(&w, r, 5);
         assert_eq!(c, Color::new(0., 0., 0.));
     }
 
@@ -92,7 +92,7 @@ mod tests {
     fn test_intersect_world_ray_hit() {
         let w = World::default();
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let c = color_at(&w, r);
+        let c = color_at(&w, r, 5);
         assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855));
     }
 
@@ -109,7 +109,7 @@ mod tests {
             _ => panic!("Shape is not a sphere"),
         }
         let r = Ray::new(point(0., 0., 0.75), vector(0., 0., -1.));
-        let c = color_at(&w, r);
+        let c = color_at(&w, r, 5);
 
         match w.objects[1] {
             ShapeEnum::Sphere(sphere) => {
@@ -158,7 +158,7 @@ mod tests {
         let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
         let i = Intersection::new(4., ShapeEnum::Sphere(s2));
         let comps = prepare_computations(i, r);
-        let c = shade_hit(&w, comps);
+        let c = shade_hit(&w, comps, 5);
         assert_eq!(c, Color::new(0.1, 0.1, 0.1));
     }
 
@@ -184,7 +184,7 @@ mod tests {
         shape.material.ambient = 1.;
         let i = Intersection::new(1., w.objects[1]);
         let comps = prepare_computations(i, r);
-        let color = reflected_color(&w, comps);
+        let color = reflected_color(&w, comps, 5);
         assert_eq!(color, Color::new(0., 0., 0.));
     }
 
@@ -205,7 +205,7 @@ mod tests {
         );
         let i = Intersection::new(f32::sqrt(2.), shape);
         let comps = prepare_computations(i, r);
-        let color = reflected_color(&w, comps);
+        let color = reflected_color(&w, comps, 5);
         assert_eq!(color, Color::new(0.19034664, 0.23793328, 0.14275998));
     }
 
@@ -226,7 +226,52 @@ mod tests {
         );
         let i = Intersection::new(f32::sqrt(2.), shape);
         let comps = prepare_computations(i, r);
-        let color = shade_hit(&w, comps);
+        let color = shade_hit(&w, comps, 5);
         assert_eq!(color, Color::new(0.87677, 0.92436, 0.82918));
+    }
+
+    #[test]
+    fn test_color_reflective_surfaces() {
+        let mut w = World::default();
+        w.light = Some(PointLight::new(point(0., 0., 0.), Color::new(1., 1., 1.)));
+        let mut lower = Plane::default();
+        let mut material = Material::default();
+        material.reflective = 1.;
+        let transform = translation(0., -1., 0.);
+        lower.set_transform(transform);
+        lower.material = material;
+        let lower = ShapeEnum::Plane(lower);
+        w.objects.push(lower);
+
+        let mut upper = Plane::default();
+        let mut material = Material::default();
+        material.reflective = 1.;
+        let transform = translation(0., 1., 0.);
+        upper.set_transform(transform);
+        upper.material = material;
+        let upper = ShapeEnum::Plane(upper);
+        w.objects.push(upper);
+
+        let r = Ray::new(point(0., 0., 0.), vector(0., 1., 0.));
+        color_at(&w, r, 5);
+    }
+
+    #[test]
+    fn test_reflected_color_max_depth() {
+        let mut w = World::default();
+        let mut shape = Plane::default();
+        let mut material = Material::default();
+        material.reflective = 0.5;
+        let transform = translation(0., -1., 0.);
+        shape.set_transform(transform);
+        shape.material = material;
+        let shape = ShapeEnum::Plane(shape);
+        w.objects.push(shape);
+
+        let r = Ray::new(point(0., 0., -3.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let i = Intersection::new(f32::sqrt(2.), shape);
+        let comps = prepare_computations(i, r);
+        let color = reflected_color(&w, comps, 0);
+        assert_eq!(color, Color::new(0., 0., 0.));
     }
 }

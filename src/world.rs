@@ -76,13 +76,13 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
     intersections
 }
 
-pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
+pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color {
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
     };
 
-    let reflection = reflected_color(world, comps);
+    let reflection = reflected_color(world, comps, remaining);
     let light = lighting(
         material,
         comps.object,
@@ -96,7 +96,7 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
     light + reflection
 }
 
-pub fn color_at(world: &World, ray: Ray) -> Color {
+pub fn color_at(world: &World, ray: Ray, remaining: u16) -> Color {
     let intersections = intersect_world(world, ray);
     let hits = hit(intersections);
 
@@ -105,7 +105,7 @@ pub fn color_at(world: &World, ray: Ray) -> Color {
     }
 
     let comps = prepare_computations(hits.unwrap(), ray);
-    shade_hit(world, comps)
+    shade_hit(world, comps, remaining)
 }
 
 pub fn is_shadowed(world: &World, point: Tuple) -> bool {
@@ -128,7 +128,11 @@ pub fn is_shadowed(world: &World, point: Tuple) -> bool {
     }
 }
 
-pub fn reflected_color(w: &World, comps: Precomputation) -> Color {
+pub fn reflected_color(w: &World, comps: Precomputation, remaining: u16) -> Color {
+    if remaining < 1 {
+        return Color::new(0., 0., 0.);
+    }
+
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
@@ -139,7 +143,7 @@ pub fn reflected_color(w: &World, comps: Precomputation) -> Color {
     }
 
     let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
-    let color = color_at(&w, reflect_ray);
+    let color = color_at(&w, reflect_ray, remaining - 1);
 
     color * material.reflective
 }
