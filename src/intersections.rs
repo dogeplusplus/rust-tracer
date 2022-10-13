@@ -3,7 +3,7 @@ use crate::{
     ray::{position, Ray},
     shape::normal_at,
     world::ShapeEnum,
-    Tuple,
+    Tuple, reflect,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -35,6 +35,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
     None
 }
 
+#[derive(Clone, Copy)]
 pub struct Precomputation {
     pub t: f32,
     pub object: ShapeEnum,
@@ -43,6 +44,7 @@ pub struct Precomputation {
     pub normalv: Tuple,
     pub inside: bool,
     pub over_point: Tuple,
+    pub reflectv: Tuple,
 }
 
 pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
@@ -60,6 +62,8 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
     // Based on experiments, seems like this amount of perturbation is needed to avoid acne
     let over_point = pos + normal * 1e-4;
 
+    let reflection = reflect(ray.direction, normal);
+
     Precomputation {
         t: intersection.t,
         object: intersection.object,
@@ -68,5 +72,6 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         normalv: normal,
         inside,
         over_point,
+        reflectv: reflection,
     }
 }

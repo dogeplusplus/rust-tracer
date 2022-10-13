@@ -8,7 +8,7 @@ use tracer::lights::PointLight;
 use tracer::materials::Material;
 use tracer::patterns::GradientPattern;
 use tracer::patterns::RadialGradient;
-use tracer::patterns::{CheckerPattern, Pattern, PatternType, RingPattern, StripePattern};
+use tracer::patterns::{CheckerPattern, Pattern, PatternType, RingPattern};
 use tracer::plane::Plane;
 use tracer::sphere::Sphere;
 use tracer::transforms::{rotation_x, scaling, shearing, translation, view_transform};

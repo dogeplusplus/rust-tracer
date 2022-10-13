@@ -1,7 +1,10 @@
 mod tests {
+    use tracer::intersections::{Intersection, prepare_computations};
     use tracer::lights::{lighting, PointLight};
     use tracer::materials::Material;
     use tracer::patterns::{Pattern, PatternType, StripePattern};
+    use tracer::plane::Plane;
+    use tracer::ray::Ray;
     use tracer::sphere::Sphere;
     use tracer::world::ShapeEnum;
     use tracer::{point, vector, Color};
@@ -117,5 +120,21 @@ mod tests {
         let c2 = lighting(m, obj, light, point(1.1, 0., 0.), eyev, normalv, false);
         assert_eq!(c1, white);
         assert_eq!(c2, black);
+    }
+
+    #[test]
+    fn test_reflectivity_material() {
+        let m = Material::default();
+        assert_eq!(m.reflective, 0.0);
+    }
+
+    #[test]
+    fn test_precompute_reflection() {
+        let shape = Plane::default();
+        let r = Ray::new(point(0., 1., -1.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let i = Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(shape));
+        let comps = prepare_computations(i, r);
+
+        assert_eq!(comps.reflectv, vector(0., f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
     }
 }

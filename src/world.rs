@@ -82,7 +82,8 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
         ShapeEnum::Plane(plane) => plane.material,
     };
 
-    lighting(
+    let reflection = reflected_color(world, comps);
+    let light = lighting(
         material,
         comps.object,
         world.light.unwrap(),
@@ -90,7 +91,9 @@ pub fn shade_hit(world: &World, comps: Precomputation) -> Color {
         comps.eyev,
         comps.normalv,
         is_shadowed(world, comps.over_point),
-    )
+    );
+
+    light + reflection
 }
 
 pub fn color_at(world: &World, ray: Ray) -> Color {
@@ -123,4 +126,20 @@ pub fn is_shadowed(world: &World, point: Tuple) -> bool {
     } else {
         return false;
     }
+}
+
+pub fn reflected_color(w: &World, comps: Precomputation) -> Color {
+    let material = match comps.object {
+        ShapeEnum::Sphere(sphere) => sphere.material,
+        ShapeEnum::Plane(plane) => plane.material,
+    };
+
+    if material.reflective == 0. {
+        Color::new(0., 0., 0.);
+    }
+
+    let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
+    let color = color_at(&w, reflect_ray);
+    
+    color * material.reflective
 }
