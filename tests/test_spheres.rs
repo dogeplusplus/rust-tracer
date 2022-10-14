@@ -5,7 +5,7 @@ mod tests {
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
     use tracer::shape::{intersect, normal_at, Shape};
-    use tracer::sphere::Sphere;
+    use tracer::sphere::{Sphere, glass_sphere};
     use tracer::transforms::{rotation_z, scaling, translation};
     use tracer::world::ShapeEnum;
     use tracer::{magnitude, normalize, point, vector};
@@ -172,5 +172,19 @@ mod tests {
         m.ambient = 1.;
         s.material = m;
         assert_eq!(s.material, m);
+    }
+
+    #[test]
+    fn test_glassy_sphere() {
+        let s = glass_sphere();
+        let identity = Matrix::new([
+            [1., 0., 0., 0.],
+            [0., 1., 0., 0.],
+            [0., 0., 1., 0.],
+            [0., 0., 0., 1.],
+        ]);
+        assert_eq!(s.get_transform(), identity);
+        assert_eq!(s.material.transparency, 1.0);
+        assert_eq!(s.material.refractive_index, 1.5);
     }
 }

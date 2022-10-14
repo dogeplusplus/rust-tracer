@@ -46,9 +46,11 @@ pub struct Precomputation {
     pub inside: bool,
     pub over_point: Tuple,
     pub reflectv: Tuple,
+    pub n1: f32,
+    pub n2: f32,
 }
 
-pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputation {
+pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections: Vec<Intersection>) -> Precomputation {
     let pos = position(ray, intersection.t);
     let mut normal = match intersection.object {
         ShapeEnum::Plane(plane) => normal_at(plane, pos),
@@ -65,6 +67,41 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
 
     let reflection = reflect(ray.direction, normal);
 
+    // Calculate refractive indices
+    let mut n1 = 1.;
+    let mut n2 = 1.;
+    let mut containers = Vec::new();
+
+    for inter in intersections {
+        if inter == intersection {
+            if containers.len() == 0 {
+                n1 = 1.0;
+            } else {
+                n1 = match containers.last().unwrap() {
+                    ShapeEnum::Sphere(sphere) => sphere.material.refractive_index,
+                    ShapeEnum::Plane(plane) => plane.material.refractive_index,
+                };
+            }
+        }
+
+        if containers.contains(&inter.object) {
+            containers.retain(|&x| x != inter.object);
+        } else {
+            containers.push(inter.object);
+        }
+
+        if inter == intersection {
+            if containers.len() == 0 {
+                n2 = 1.;
+            } else {
+                n2 = match containers.last().unwrap() {
+                    ShapeEnum::Sphere(sphere) => sphere.material.refractive_index,
+                    ShapeEnum::Plane(plane) => plane.material.refractive_index,
+                };
+            }
+        }
+    }
+
     Precomputation {
         t: intersection.t,
         object: intersection.object,
@@ -74,5 +111,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray) -> Precomputat
         inside,
         over_point,
         reflectv: reflection,
+        n1,
+        n2,
     }
 }

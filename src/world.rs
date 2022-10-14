@@ -98,13 +98,13 @@ pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color 
 
 pub fn color_at(world: &World, ray: Ray, remaining: u16) -> Color {
     let intersections = intersect_world(world, ray);
-    let hits = hit(intersections);
+    let hits = hit(intersections.clone());
 
     if hits.is_none() {
         return Color::new(0., 0., 0.);
     }
 
-    let comps = prepare_computations(hits.unwrap(), ray);
+    let comps = prepare_computations(hits.unwrap(), ray, intersections);
     shade_hit(world, comps, remaining)
 }
 

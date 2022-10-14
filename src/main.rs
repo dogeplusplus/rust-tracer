@@ -22,6 +22,7 @@ fn main() -> Result<(), &'static str> {
     middle.material.color = Color::new(0.1, 1., 0.5);
     middle.material.diffuse = 0.7;
     middle.material.specular = 0.3;
+    middle.material.reflective = 1.;
 
     let stripe = PatternType::Radial(RadialGradient::new(
         Color::new(1.0, 0.5, 0.0),

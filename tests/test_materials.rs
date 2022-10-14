@@ -136,11 +136,18 @@ mod tests {
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let i = Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(shape));
-        let comps = prepare_computations(i, r);
+        let comps = prepare_computations(i, r, vec![i]);
 
         assert_eq!(
             comps.reflectv,
             vector(0., f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.)
         );
+    }
+
+    #[test]
+    fn test_transparency_refractive() {
+        let m = Material::default();
+        assert_eq!(m.transparency, 0.);
+        assert_eq!(m.refractive_index, 1.0);
     }
 }

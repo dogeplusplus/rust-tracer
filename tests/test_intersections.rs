@@ -1,7 +1,9 @@
 mod tests {
     use tracer::intersections::{hit, prepare_computations, Intersection};
     use tracer::ray::Ray;
-    use tracer::sphere::Sphere;
+    use tracer::shape::Shape;
+    use tracer::sphere::{Sphere, glass_sphere};
+    use tracer::transforms::{scaling, translation};
     use tracer::world::ShapeEnum;
     use tracer::{point, vector};
 
@@ -72,7 +74,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(4., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r);
+        let comps = prepare_computations(i, r, vec![i]);
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.object, i.object);
         assert_eq!(comps.point, point(0., 0., -1.));
@@ -85,7 +87,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(4., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r);
+        let comps = prepare_computations(i, r, vec![i]);
         assert!(!comps.inside);
     }
 
@@ -94,10 +96,52 @@ mod tests {
         let r = Ray::new(point(0., 0., 0.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(1., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r);
+        let comps = prepare_computations(i, r, vec![i]);
         assert_eq!(comps.point, point(0., 0., 1.));
         assert_eq!(comps.eyev, vector(0., 0., -1.));
         assert!(comps.inside);
         assert_eq!(comps.normalv, vector(0., 0., -1.));
+    }
+
+    #[test]
+    fn test_refraction_multi_intersection() {
+        let mut a = glass_sphere();
+        a.set_transform(scaling(2., 2., 2.));
+        a.material.refractive_index = 1.5;
+
+        let mut b = glass_sphere();
+        b.set_transform(translation(0., 0., -0.25));
+        b.material.refractive_index = 2.0;
+
+        let mut c = glass_sphere();
+        c.set_transform(translation(0., 0., 0.25));
+        c.material.refractive_index = 2.5;
+
+        let xs = vec![
+            Intersection::new(2., ShapeEnum::Sphere(a)),
+            Intersection::new(2.75, ShapeEnum::Sphere(b)),
+            Intersection::new(3.25, ShapeEnum::Sphere(c)),
+            Intersection::new(4.75, ShapeEnum::Sphere(b)),
+            Intersection::new(5.25, ShapeEnum::Sphere(c)),
+            Intersection::new(6., ShapeEnum::Sphere(a)),
+        ];
+
+        let results = vec![
+            (1.0, 1.5),
+            (1.5, 2.0),
+            (2.0, 2.5),
+            (2.5, 2.5),
+            (2.5, 1.5),
+            (1.5, 1.0),
+        ];
+        
+        let r = Ray::new(point(0., 0., -4.), vector(0., 0., 1.));
+        for idx in 0..results.len() {
+            let intersection = xs[idx];
+            let result = results[idx];
+            let comps = prepare_computations(intersection, r, xs.clone());
+            assert_eq!(comps.n1, result.0);
+            assert_eq!(comps.n2, result.1);
+        }
     }
 }

@@ -66,3 +66,10 @@ impl Shape for Sphere {
         normalize(world_normal)
     }
 }
+
+pub fn glass_sphere() -> Sphere {
+    let mut s = Sphere::default();
+    s.material.transparency = 1.0;
+    s.material.refractive_index = 1.5;
+    s
+}
