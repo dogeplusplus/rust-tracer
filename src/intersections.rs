@@ -45,6 +45,7 @@ pub struct Precomputation {
     pub normalv: Tuple,
     pub inside: bool,
     pub over_point: Tuple,
+    pub under_point: Tuple,
     pub reflectv: Tuple,
     pub n1: f32,
     pub n2: f32,
@@ -64,6 +65,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections:
     }
     // Based on experiments, seems like this amount of perturbation is needed to avoid acne
     let over_point = pos + normal * 1e-4;
+    let under_point = pos - normal * 1e-4;
 
     let reflection = reflect(ray.direction, normal);
 
@@ -110,8 +112,26 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections:
         normalv: normal,
         inside,
         over_point,
+        under_point,
         reflectv: reflection,
         n1,
         n2,
     }
+}
+
+pub fn shlick(comps: Precomputation) -> f32 {
+    let mut cos = dot(comps.eyev, comps.normalv);
+
+    if comps.n1 > comps.n2 {
+        let n = comps.n1 / comps.n2;
+        let sin2_t = f32::powi(n, 2) * (1. - f32::powi(cos, 2));
+        if sin2_t > 1. {
+            return 1.
+        }
+        let cos_t = f32::sqrt(1. - sin2_t);
+        cos = cos_t;
+    }
+
+    let r0 = f32::powi((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
+    r0 + (1. - r0) * f32::powi(1. - cos, 5)
 }

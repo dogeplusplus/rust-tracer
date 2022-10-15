@@ -13,9 +13,9 @@ mod tests {
         vector,
         world::{
             color_at, contains, intersect_world, is_shadowed, reflected_color, shade_hit,
-            ShapeEnum, World,
+            ShapeEnum, World, refracted_color,
         },
-        Color,
+        Color, patterns::{Pattern, PatternType},
     };
 
     #[test]
@@ -273,5 +273,136 @@ mod tests {
         let comps = prepare_computations(i, r, vec![i]);
         let color = reflected_color(&w, comps, 0);
         assert_eq!(color, Color::new(0., 0., 0.));
+    }
+
+    #[test]
+    fn test_refraction_opaque() {
+        let w = World::default();
+        let shape = w.objects.first().unwrap();
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let xs = vec![
+            Intersection::new(4., *shape),
+            Intersection::new(6., *shape),
+        ];
+        let comps = prepare_computations(xs[0], r, xs);
+        let c = refracted_color(&w, comps, 5);
+        assert_eq!(c, Color::new(0., 0., 0.));
+    }
+
+    #[test]
+    fn test_refraction_max_depth() {
+        let w = World::default();
+        let shape = w.objects[0];
+        match shape {
+            ShapeEnum::Sphere(mut sphere) => {
+                sphere.material.transparency = 1.;
+                sphere.material.refractive_index = 1.5;
+            },
+            _ => panic!("Not a sphere"),
+        }
+
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let xs = vec![
+            Intersection::new(4., shape),
+            Intersection::new(6., shape),
+        ];
+        let comps = prepare_computations(xs[0], r, xs);
+        let c = refracted_color(&w, comps, 0);
+        assert_eq!(c, Color::new(0., 0., 0.));
+    }
+
+    #[test]
+    fn test_total_internal_reflection() {
+        let mut w = World::default();
+        if let ShapeEnum::Sphere(ref mut sphere) = w.objects[0] {
+            sphere.material.transparency = 1.;
+            sphere.material.refractive_index = 1.5;
+        }
+        let r = Ray::new(point(0., 0., f32::sqrt(2.) / 2.), vector(0., 1., 0.));
+        let xs = vec![
+            Intersection::new(-f32::sqrt(2.) / 2., w.objects[0]),
+            Intersection::new(f32::sqrt(2.) / 2., w.objects[0]),
+        ];
+        
+        let comps = prepare_computations(xs[1], r, xs);
+        let c = refracted_color(&w, comps, 5);
+        assert_eq!(c, Color::new(0., 0., 0.));
+    }
+
+    #[test]
+    fn test_refracted_color_ray() {
+        let mut w = World::default();
+
+        if let ShapeEnum::Sphere(ref mut sphere) = w.objects[0] {
+            sphere.material.ambient = 1.;
+            sphere.material.pattern = Some(Pattern::new(PatternType::Test()));
+        }
+
+        if let ShapeEnum::Sphere(ref mut sphere) = w.objects[1] {
+            sphere.material.transparency = 1.;
+            sphere.material.refractive_index = 1.5;
+        }
+
+        let r = Ray::new(point(0., 0., 0.1), vector(0., 1., 0.));
+        let xs = vec![
+            Intersection::new(-0.9899, w.objects[0]),
+            Intersection::new(-0.4899, w.objects[1]),
+            Intersection::new(0.4899, w.objects[1]),
+            Intersection::new(0.9899, w.objects[0]),
+        ];
+
+        let comps = prepare_computations(xs[2], r, xs);
+        let c = refracted_color(&w, comps, 5);
+        assert_eq!(c, Color::new(0., 0.99878335, 0.04724201));
+    }
+
+    #[test]
+    fn test_shade_hit_transparent() {
+        let mut w = World::default();
+        let mut floor = Plane::default();
+        floor.set_transform(translation(0., -1., 0.));
+        floor.material.transparency = 0.5;
+        floor.material.refractive_index = 1.5;
+        w.objects.push(ShapeEnum::Plane(floor));
+
+        let mut ball = Sphere::default();
+        ball.material.color = Color::new(1., 0., 0.);
+        ball.material.ambient = 0.5;
+        ball.set_transform(translation(0., -3.5, -0.5));
+
+        w.objects.push(ShapeEnum::Sphere(ball));
+
+        let r = Ray::new(point(0., 0., -3.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let xs = vec![
+            Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(floor)),
+        ];
+        let comps = prepare_computations(xs[0], r, xs);
+        let color = shade_hit(&w, comps, 5);
+        assert_eq!(color, Color::new(0.93642, 0.68642, 0.68642));
+    }
+
+    #[test]
+    fn test_shade_hit_reflective_transparent() {
+        let mut w = World::default();
+        let r = Ray::new(point(0., 0., -3.), vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.));
+        let mut floor = Plane::default();
+        floor.set_transform(translation(0., -1., 0.));
+        floor.material.reflective = 0.5;
+        floor.material.transparency = 0.5;
+        floor.material.refractive_index = 1.5;
+        w.objects.push(ShapeEnum::Plane(floor));
+
+        let mut ball = Sphere::default();
+        ball.material.color = Color::new(1., 0., 0.);
+        ball.material.ambient = 0.5;
+        ball.set_transform(translation(0., -3.5, -0.5));
+        w.objects.push(ShapeEnum::Sphere(ball));
+
+        let xs = vec![
+            Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(floor)),
+        ];
+        let comps = prepare_computations(xs[0], r, xs);
+        let color = shade_hit(&w, comps, 5);
+        assert_eq!(color, Color::new(0.93391, 0.69643, 0.69243));
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    intersections::{hit, prepare_computations, Intersection, Precomputation},
+    intersections::{hit, prepare_computations, Intersection, Precomputation, shlick},
     lights::{lighting, PointLight},
     magnitude,
     materials::Material,
@@ -10,7 +10,7 @@ use crate::{
     shape::intersect,
     sphere::Sphere,
     transforms::scaling,
-    Color, Tuple,
+    Color, Tuple, dot,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -82,7 +82,8 @@ pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color 
         ShapeEnum::Plane(plane) => plane.material,
     };
 
-    let reflection = reflected_color(world, comps, remaining);
+    let reflected = reflected_color(world, comps, remaining);
+    let refracted = refracted_color(world, comps, remaining);
     let light = lighting(
         material,
         comps.object,
@@ -93,7 +94,12 @@ pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color 
         is_shadowed(world, comps.over_point),
     );
 
-    light + reflection
+    if material.reflective > 0. && material.transparency > 0. {
+        let reflectance = shlick(comps);
+        light + reflected * reflectance + refracted * (1. - reflectance)
+    } else {
+        light + reflected + refracted
+    }
 }
 
 pub fn color_at(world: &World, ray: Ray, remaining: u16) -> Color {
@@ -146,4 +152,37 @@ pub fn reflected_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     let color = color_at(&w, reflect_ray, remaining - 1);
 
     color * material.reflective
+}
+
+pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Color {
+    let black = Color::new(0., 0., 0.);
+
+    if remaining < 1 {
+        return black;
+    }
+
+    // Find ratio of first refractive to second
+    // cos theta is the same as the dot product of two vectors 
+    let n_ratio = comps.n1 / comps.n2;
+    let cos_i = dot(comps.eyev, comps.normalv);
+    let sin2_t = f32::powi(n_ratio, 2) * (1. - f32::powi(cos_i, 2));
+    let cos_t = f32::sqrt(1. - sin2_t);
+
+    // Total internal reflection
+    if sin2_t > 1. {
+        return black;
+    }
+
+    // Direction of refracted ray
+    let direction = comps.normalv * (n_ratio * cos_i - cos_t) - comps.eyev * n_ratio;
+    let refract_ray = Ray::new(comps.under_point, direction);
+
+
+    let material = match comps.object {
+        ShapeEnum::Sphere(sphere) => sphere.material,
+        ShapeEnum::Plane(plane) => plane.material,
+    };
+
+    let color = color_at(w, refract_ray, remaining - 1) * material.transparency;
+    color
 }

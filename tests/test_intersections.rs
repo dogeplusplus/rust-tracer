@@ -1,5 +1,5 @@
 mod tests {
-    use tracer::intersections::{hit, prepare_computations, Intersection};
+    use tracer::intersections::{hit, prepare_computations, Intersection, shlick};
     use tracer::ray::Ray;
     use tracer::shape::Shape;
     use tracer::sphere::{Sphere, glass_sphere};
@@ -143,5 +143,55 @@ mod tests {
             assert_eq!(comps.n1, result.0);
             assert_eq!(comps.n2, result.1);
         }
+    }
+
+    #[test]
+    fn test_under_point_below_surface() {
+        let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
+        let mut shape = glass_sphere();
+        shape.transform = translation(0., 0., 1.);
+        let i = Intersection::new(5., ShapeEnum::Sphere(shape));
+        let xs = vec![i];
+        let comps = prepare_computations(i, r, xs);
+        assert_eq!(comps.under_point.z, 1e-4);
+        assert!(comps.point.z < comps.under_point.z);
+    }
+
+    #[test]
+    fn test_shlick_approximation() {
+        let shape = glass_sphere();
+        let r = Ray::new(point(0., 0., f32::sqrt(2.) / 2.), vector(0., 1., 0.));
+        let xs = vec![
+            Intersection::new(-f32::sqrt(2.) / 2., ShapeEnum::Sphere(shape)),
+            Intersection::new(f32::sqrt(2.) / 2., ShapeEnum::Sphere(shape)),
+        ];
+        let comps = prepare_computations(xs[1], r, xs);
+        let reflectance = shlick(comps);
+        assert_eq!(reflectance, 1.);
+    }
+
+    #[test]
+    fn test_shlick_perpendicular() {
+        let shape = ShapeEnum::Sphere(glass_sphere());
+        let r = Ray::new(point(0., 0., 0.), vector(0., 1., 0.));
+        let xs = vec![
+            Intersection::new(-1., shape),
+            Intersection::new(1., shape),
+        ];
+        let comps = prepare_computations(xs[1], r, xs);
+        let reflectance = shlick(comps);
+        assert_eq!(reflectance, 0.040000003);
+    }
+
+    #[test]
+    fn test_shlick_small_angle() {
+        let shape = ShapeEnum::Sphere(glass_sphere());
+        let r = Ray::new(point(0., 0.99, -2.), vector(0., 0., 1.));
+        let xs = vec![
+            Intersection::new(1.8589, shape),
+        ];
+        let comps = prepare_computations(xs[0], r, xs);
+        let reflectance = shlick(comps);
+        assert_eq!(reflectance, 0.48873067);
     }
 }
