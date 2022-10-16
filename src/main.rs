@@ -31,21 +31,8 @@ fn main() -> Result<(), &'static str> {
     let mut stripe_pattern = Pattern::new(stripe);
     stripe_pattern.set_transform(scaling(0.5, 0.5, 0.5));
     middle.material.pattern = Some(stripe_pattern);
-
-    let mut right = Sphere::default();
-    right.transform = translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5);
-    right.material = Material::default();
-    right.material.color = Color::new(0.5, 1.0, 0.1);
-    right.material.diffuse = 0.7;
-    right.material.specular = 0.3;
-
-    let ring = PatternType::Ring(RingPattern::new(
-        Color::new(0.0, 0.9, 0.9),
-        Color::new(0.5, 0.5, 0.),
-    ));
-    let mut ring_pattern = Pattern::new(ring);
-    ring_pattern.set_transform(rotation_x(PI / 2.) * scaling(0.2, 0.2, 0.2));
-    right.material.pattern = Some(ring_pattern);
+    middle.material.transparency = 0.9;
+    middle.material.reflective = 0.9;
 
     let mut left = Sphere::default();
     left.transform = translation(-1., 0., -1.75)
@@ -75,7 +62,6 @@ fn main() -> Result<(), &'static str> {
     let mut world = World::default();
     world.objects = vec![
         ShapeEnum::Sphere(middle),
-        ShapeEnum::Sphere(right),
         ShapeEnum::Sphere(left),
         ShapeEnum::Plane(floor),
     ];
@@ -83,7 +69,7 @@ fn main() -> Result<(), &'static str> {
         point(-10., 10., -10.),
         Color::new(1., 1., 1.),
     ));
-    let mut camera = Camera::new(500, 250, PI / 3.);
+    let mut camera = Camera::new(1000, 500, PI / 3.);
     camera.transform = view_transform(point(0., 1.5, -5.), point(0., 1., 0.), vector(0., 1., 0.));
     let canvas = render(camera, world)?;
     let ppm = canvas_to_ppm(&canvas);
