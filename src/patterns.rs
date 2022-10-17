@@ -129,6 +129,7 @@ pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) ->
     let shape_inv = match shape {
         ShapeEnum::Plane(plane) => plane.transform.inverse().unwrap(),
         ShapeEnum::Sphere(sphere) => sphere.transform.inverse().unwrap(),
+        ShapeEnum::Cube(cube) => cube.transform.inverse().unwrap(),
     };
     let world_point = shape_inv * point;
     let pattern_point = pattern_inv * world_point;

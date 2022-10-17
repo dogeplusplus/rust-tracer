@@ -9,6 +9,7 @@ use crate::{
     ray::Ray,
     shape::intersect,
     sphere::Sphere,
+    cube::Cube,
     transforms::scaling,
     Color, Tuple, dot,
 };
@@ -17,6 +18,7 @@ use crate::{
 pub enum ShapeEnum {
     Sphere(Sphere),
     Plane(Plane),
+    Cube(Cube),
 }
 
 #[derive(Clone)]
@@ -69,6 +71,7 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
         let obj_intersects = match *obj {
             ShapeEnum::Plane(plane) => intersect(plane, ray),
             ShapeEnum::Sphere(sphere) => intersect(sphere, ray),
+            ShapeEnum::Cube(cube) => intersect(cube, ray),
         };
         intersections.extend(obj_intersects);
     }
@@ -80,6 +83,7 @@ pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color 
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
+        ShapeEnum::Cube(cube) => cube.material,
     };
 
     let reflected = reflected_color(world, comps, remaining);
@@ -142,6 +146,7 @@ pub fn reflected_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
+        ShapeEnum::Cube(cube) => cube.material,
     };
 
     if material.reflective == 0. {
@@ -181,6 +186,7 @@ pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
+        ShapeEnum::Cube(cube) => cube.material,
     };
 
     let color = color_at(w, refract_ray, remaining - 1) * material.transparency;

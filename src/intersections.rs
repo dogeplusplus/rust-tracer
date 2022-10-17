@@ -56,6 +56,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections:
     let mut normal = match intersection.object {
         ShapeEnum::Plane(plane) => normal_at(plane, pos),
         ShapeEnum::Sphere(sphere) => normal_at(sphere, pos),
+        ShapeEnum::Cube(cube) => normal_at(cube, pos),
     };
     let eye = -ray.direction;
     let mut inside = false;
@@ -82,6 +83,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections:
                 n1 = match containers.last().unwrap() {
                     ShapeEnum::Sphere(sphere) => sphere.material.refractive_index,
                     ShapeEnum::Plane(plane) => plane.material.refractive_index,
+                    ShapeEnum::Cube(cube) => cube.material.refractive_index,
                 };
             }
         }
@@ -99,6 +101,7 @@ pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections:
                 n2 = match containers.last().unwrap() {
                     ShapeEnum::Sphere(sphere) => sphere.material.refractive_index,
                     ShapeEnum::Plane(plane) => plane.material.refractive_index,
+                    ShapeEnum::Cube(cube) => cube.material.refractive_index,
                 };
             }
         }
