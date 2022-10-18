@@ -7,14 +7,13 @@ use tracer::canvas::canvas_to_ppm;
 use tracer::cube::Cube;
 use tracer::lights::PointLight;
 use tracer::materials::Material;
-use tracer::patterns::GradientPattern;
 use tracer::patterns::StripePattern;
 use tracer::patterns::{CheckerPattern, Pattern, PatternType};
 use tracer::plane::Plane;
 use tracer::shape::Shape;
 use tracer::sphere::Sphere;
 use tracer::transforms::rotation_z;
-use tracer::transforms::{rotation_x, scaling, shearing, translation, view_transform};
+use tracer::transforms::{rotation_x, scaling, translation, view_transform};
 use tracer::world::{ShapeEnum, World};
 use tracer::{point, vector, Color};
 

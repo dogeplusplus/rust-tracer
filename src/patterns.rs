@@ -1,4 +1,4 @@
-use crate::{magnitude, matrix::Matrix, world::ShapeEnum, Color, Tuple};
+use crate::{magnitude, matrix::Matrix, world::ShapeEnum, Color, Tuple, shape::Shape};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PatternType {
@@ -127,9 +127,10 @@ impl CheckerPattern {
 pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) -> Color {
     let pattern_inv = pattern.transform.inverse().unwrap();
     let shape_inv = match shape {
-        ShapeEnum::Plane(plane) => plane.transform.inverse().unwrap(),
-        ShapeEnum::Sphere(sphere) => sphere.transform.inverse().unwrap(),
-        ShapeEnum::Cube(cube) => cube.transform.inverse().unwrap(),
+        ShapeEnum::Plane(plane) => plane.get_transform().inverse().unwrap(),
+        ShapeEnum::Sphere(sphere) => sphere.get_transform().inverse().unwrap(),
+        ShapeEnum::Cube(cube) => cube.get_transform().inverse().unwrap(),
+        ShapeEnum::Cylinder(cylinder) => cylinder.get_transform().inverse().unwrap(),
     };
     let world_point = shape_inv * point;
     let pattern_point = pattern_inv * world_point;
