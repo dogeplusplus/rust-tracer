@@ -1,8 +1,8 @@
 mod tests {
-    use tracer::intersections::{hit, prepare_computations, Intersection, shlick};
+    use tracer::intersections::{hit, prepare_computations, shlick, Intersection};
     use tracer::ray::Ray;
     use tracer::shape::Shape;
-    use tracer::sphere::{Sphere, glass_sphere};
+    use tracer::sphere::{glass_sphere, Sphere};
     use tracer::transforms::{scaling, translation};
     use tracer::world::ShapeEnum;
     use tracer::{point, vector};
@@ -134,7 +134,7 @@ mod tests {
             (2.5, 1.5),
             (1.5, 1.0),
         ];
-        
+
         let r = Ray::new(point(0., 0., -4.), vector(0., 0., 1.));
         for idx in 0..results.len() {
             let intersection = xs[idx];
@@ -174,10 +174,7 @@ mod tests {
     fn test_shlick_perpendicular() {
         let shape = ShapeEnum::Sphere(glass_sphere());
         let r = Ray::new(point(0., 0., 0.), vector(0., 1., 0.));
-        let xs = vec![
-            Intersection::new(-1., shape),
-            Intersection::new(1., shape),
-        ];
+        let xs = vec![Intersection::new(-1., shape), Intersection::new(1., shape)];
         let comps = prepare_computations(xs[1], r, xs);
         let reflectance = shlick(comps);
         assert_eq!(reflectance, 0.040000003);
@@ -187,9 +184,7 @@ mod tests {
     fn test_shlick_small_angle() {
         let shape = ShapeEnum::Sphere(glass_sphere());
         let r = Ray::new(point(0., 0.99, -2.), vector(0., 0., 1.));
-        let xs = vec![
-            Intersection::new(1.8589, shape),
-        ];
+        let xs = vec![Intersection::new(1.8589, shape)];
         let comps = prepare_computations(xs[0], r, xs);
         let reflectance = shlick(comps);
         assert_eq!(reflectance, 0.48873067);

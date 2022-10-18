@@ -5,7 +5,7 @@ mod tests {
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
     use tracer::shape::{intersect, normal_at, Shape};
-    use tracer::sphere::{Sphere, glass_sphere};
+    use tracer::sphere::{glass_sphere, Sphere};
     use tracer::transforms::{rotation_z, scaling, translation};
     use tracer::world::ShapeEnum;
     use tracer::{magnitude, normalize, point, vector};

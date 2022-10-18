@@ -1,11 +1,12 @@
-use rayon::prelude::*;
 use crate::{
     canvas::{write_pixel, Canvas},
     matrix::Matrix,
     normalize, point,
     ray::Ray,
-    world::{color_at, World}, Color,
+    world::{color_at, World},
+    Color,
 };
+use rayon::prelude::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {
@@ -66,17 +67,23 @@ pub fn ray_for_pixel(camera: Camera, px: usize, py: usize) -> Result<Ray, &'stat
 
 pub fn render(camera: Camera, world: World) -> Result<Canvas, &'static str> {
     let mut image = Canvas::new(camera.hsize, camera.vsize);
-    let colors: Vec<Vec<Color>> = (0..camera.vsize).into_par_iter().map(|y: usize| -> Vec<Color> {
-        (0..camera.hsize).into_par_iter().map(|x: usize| -> Color {
-            let ray = ray_for_pixel(camera, x, y).unwrap();
-            color_at(&world, ray, 5)
-        }).collect()
-    }).collect();
+    let colors: Vec<Vec<Color>> = (0..camera.vsize)
+        .into_par_iter()
+        .map(|y: usize| -> Vec<Color> {
+            (0..camera.hsize)
+                .into_par_iter()
+                .map(|x: usize| -> Color {
+                    let ray = ray_for_pixel(camera, x, y).unwrap();
+                    color_at(&world, ray, 5)
+                })
+                .collect()
+        })
+        .collect();
 
     for y in 0..camera.vsize {
         for x in 0..camera.hsize {
             write_pixel(&mut image, x, y, colors[y][x]);
         }
-    }    
+    }
     Ok(image)
 }

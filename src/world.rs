@@ -1,5 +1,7 @@
 use crate::{
-    intersections::{hit, prepare_computations, Intersection, Precomputation, shlick},
+    cube::Cube,
+    dot,
+    intersections::{hit, prepare_computations, shlick, Intersection, Precomputation},
     lights::{lighting, PointLight},
     magnitude,
     materials::Material,
@@ -9,9 +11,8 @@ use crate::{
     ray::Ray,
     shape::intersect,
     sphere::Sphere,
-    cube::Cube,
     transforms::scaling,
-    Color, Tuple, dot,
+    Color, Tuple,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -167,7 +168,7 @@ pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     }
 
     // Find ratio of first refractive to second
-    // cos theta is the same as the dot product of two vectors 
+    // cos theta is the same as the dot product of two vectors
     let n_ratio = comps.n1 / comps.n2;
     let cos_i = dot(comps.eyev, comps.normalv);
     let sin2_t = f32::powi(n_ratio, 2) * (1. - f32::powi(cos_i, 2));
@@ -181,7 +182,6 @@ pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     // Direction of refracted ray
     let direction = comps.normalv * (n_ratio * cos_i - cos_t) - comps.eyev * n_ratio;
     let refract_ray = Ray::new(comps.under_point, direction);
-
 
     let material = match comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,

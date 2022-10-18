@@ -51,7 +51,11 @@ pub struct Precomputation {
     pub n2: f32,
 }
 
-pub fn prepare_computations(intersection: Intersection, ray: Ray, intersections: Vec<Intersection>) -> Precomputation {
+pub fn prepare_computations(
+    intersection: Intersection,
+    ray: Ray,
+    intersections: Vec<Intersection>,
+) -> Precomputation {
     let pos = position(ray, intersection.t);
     let mut normal = match intersection.object {
         ShapeEnum::Plane(plane) => normal_at(plane, pos),
@@ -129,7 +133,7 @@ pub fn shlick(comps: Precomputation) -> f32 {
         let n = comps.n1 / comps.n2;
         let sin2_t = f32::powi(n, 2) * (1. - f32::powi(cos, 2));
         if sin2_t > 1. {
-            return 1.
+            return 1.;
         }
         let cos_t = f32::sqrt(1. - sin2_t);
         cos = cos_t;

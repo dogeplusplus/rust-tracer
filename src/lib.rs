@@ -5,6 +5,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub mod camera;
 pub mod canvas;
+pub mod cube;
 pub mod intersections;
 pub mod lights;
 pub mod materials;
@@ -16,7 +17,6 @@ pub mod shape;
 pub mod sphere;
 pub mod transforms;
 pub mod world;
-pub mod cube;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {
