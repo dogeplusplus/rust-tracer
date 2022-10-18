@@ -1,6 +1,6 @@
 use crate::{
-    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray,
-    shape::Shape, world::ShapeEnum, Tuple, vector,
+    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray, shape::Shape,
+    vector, world::ShapeEnum, Tuple,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -74,7 +74,11 @@ impl Shape for Cube {
     }
 
     fn local_normal_at(&self, world_point: Tuple) -> Tuple {
-        let maxs = [world_point.x.abs(), world_point.y.abs(), world_point.z.abs()];
+        let maxs = [
+            world_point.x.abs(),
+            world_point.y.abs(),
+            world_point.z.abs(),
+        ];
         let maxc = maxs.iter().fold(-f32::INFINITY, |a, &b| a.max(b));
 
         if maxc == world_point.x.abs() {
@@ -85,5 +89,4 @@ impl Shape for Cube {
             vector(0., 0., world_point.z)
         }
     }
-    
 }

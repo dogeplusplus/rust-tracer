@@ -1,10 +1,6 @@
 use crate::{
-    materials::Material,
-    matrix::Matrix,
-    ray::Ray,
-    intersections::Intersection,
-    shape::Shape,
-    world::ShapeEnum, vector, Tuple,
+    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray, shape::Shape,
+    vector, world::ShapeEnum, Tuple,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -32,7 +28,7 @@ impl Shape for Cylinder {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
         let a = f32::powi(ray.direction.x, 2) + f32::powi(ray.direction.z, 2);
         if a == 0. {
-            return Vec::new()
+            return Vec::new();
         }
 
         let b = 2. * ray.origin.x * ray.direction.x + 2. * ray.origin.z * ray.direction.z;
@@ -42,11 +38,8 @@ impl Shape for Cylinder {
         if disc < 0. {
             Vec::new()
         } else {
-            vec![
-                Intersection::new(1., ShapeEnum::Cylinder(*self)),
-            ]
+            vec![Intersection::new(1., ShapeEnum::Cylinder(*self))]
         }
-        
     }
 
     fn get_transform(&self) -> Matrix<f32, 4, 4> {

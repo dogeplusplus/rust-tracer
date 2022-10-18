@@ -65,7 +65,6 @@ fn main() -> Result<(), &'static str> {
     floor.material.pattern = Some(Pattern::new(checker));
     floor.material.reflective = 0.9;
 
-
     // Table
 
     let table_color = Color::new(0.8, 0.5, 0.1);

@@ -1,5 +1,6 @@
 use crate::{
     cube::Cube,
+    cylinder::Cylinder,
     dot,
     intersections::{hit, prepare_computations, shlick, Intersection, Precomputation},
     lights::{lighting, PointLight},
@@ -11,7 +12,6 @@ use crate::{
     ray::Ray,
     shape::intersect,
     sphere::Sphere,
-    cylinder::Cylinder,
     transforms::scaling,
     Color, Tuple,
 };
