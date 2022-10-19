@@ -12,6 +12,7 @@ use tracer::patterns::{CheckerPattern, Pattern, PatternType};
 use tracer::plane::Plane;
 use tracer::shape::Shape;
 use tracer::sphere::Sphere;
+use tracer::cylinder::Cylinder;
 use tracer::transforms::rotation_z;
 use tracer::transforms::{rotation_x, scaling, translation, view_transform};
 use tracer::world::{ShapeEnum, World};
@@ -85,6 +86,13 @@ fn main() -> Result<(), &'static str> {
     cube4.set_transform(translation(4., 0., 2.) * scale_factor);
     cube5.set_transform(translation(2., 3., 1.) * scaling(3., 0.2, 2.));
 
+    let mut cylinder = Cylinder::default();
+    cylinder.set_transform(translation(-2., 0., 0.));
+    cylinder.material.reflective = 0.9;
+    cylinder.material.refractive_index = 0.5;
+    cylinder.material.transparency = 0.7;
+
+
     let mut world = World::default();
     world.objects = vec![
         ShapeEnum::Plane(floor),
@@ -93,6 +101,7 @@ fn main() -> Result<(), &'static str> {
         ShapeEnum::Cube(cube3),
         ShapeEnum::Cube(cube4),
         ShapeEnum::Cube(cube5),
+        ShapeEnum::Cylinder(cylinder),
     ];
     world.light = Some(PointLight::new(
         point(-10., 10., -10.),

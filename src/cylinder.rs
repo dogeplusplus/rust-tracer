@@ -7,6 +7,8 @@ use crate::{
 pub struct Cylinder {
     transform: Matrix<f32, 4, 4>,
     pub material: Material,
+    pub minimum: f32,
+    pub maximum: f32,
 }
 
 impl Default for Cylinder {
@@ -20,6 +22,8 @@ impl Default for Cylinder {
         Cylinder {
             transform: identity,
             material: Material::default(),
+            minimum: -f32::INFINITY,
+            maximum: f32::INFINITY,
         }
     }
 }
@@ -38,7 +42,24 @@ impl Shape for Cylinder {
         if disc < 0. {
             Vec::new()
         } else {
-            vec![Intersection::new(1., ShapeEnum::Cylinder(*self))]
+            let mut t0 = (-b - f32::sqrt(disc)) / (2. * a);
+            let mut t1 = (-b + f32::sqrt(disc)) / (2. * a);
+            
+            if t0 > t1 {
+                (t0, t1) = (t1, t0);
+            }
+
+            let mut xs = Vec::new();
+            let y0 = ray.origin.y + t0 * ray.direction.y;
+            if self.minimum < y0 && y0 < self.maximum {
+                xs.push(Intersection::new(t0, ShapeEnum::Cylinder(*self)));
+            }
+
+            let y1 = ray.origin.y + t1 * ray.direction.y;
+            if self.minimum < y1 && y1 < self.maximum {
+                xs.push(Intersection::new(t1, ShapeEnum::Cylinder(*self)));
+            }
+            xs
         }
     }
 
@@ -50,7 +71,7 @@ impl Shape for Cylinder {
         self.transform = transform;
     }
 
-    fn local_normal_at(&self, _point: Tuple) -> Tuple {
-        vector(0., 0., 0.)
+    fn local_normal_at(&self, point: Tuple) -> Tuple {
+        vector(point.x, 0., point.z)
     }
 }
