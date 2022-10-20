@@ -105,9 +105,79 @@ mod tests {
         let counts = vec![0, 0, 0, 0, 0, 2];
 
         for ((origin, direction), count) in zip(zip(origins, directions), counts) {
+            let direction = normalize(direction);
             let r = Ray::new(origin, direction);
             let xs = cyl.local_intersect(r);
             assert_eq!(xs.len(), count);
         }
+    }
+
+    #[test]
+    fn test_capped() {
+        let cyl = Cylinder::default();
+        assert!(!cyl.closed);
+    }
+
+    #[test]
+    fn test_intersect_capped_cylinder() {
+        let mut cyl = Cylinder::default();
+        cyl.minimum = 1.;
+        cyl.maximum = 2.;
+        cyl.closed = true;
+
+        let origins = vec![
+            point(0., 3., 0.),
+            point(0., 3., -2.),
+            point(0., 3.99, -2.),
+            point(0., 0., -2.),
+            point(0., -0.99, -2.),
+        ];
+
+        let directions = vec![
+            vector(0., -1., 0.),
+            vector(0., -1., 2.),
+            vector(0., -1., 1.),
+            vector(0., 1., 2.),
+            vector(0., 1., 1.),
+        ];
+
+        for (origin, direction) in zip(origins, directions) {
+            let direction = normalize(direction);
+            let r = Ray::new(origin, direction);
+            let xs = cyl.local_intersect(r);
+            assert_eq!(xs.len(), 2);
+        }
+    }
+
+    #[test]
+    fn test_normal_end_caps() {
+        let mut cyl = Cylinder::default();
+        cyl.minimum = 1.;
+        cyl.maximum = 2.;
+        cyl.closed = true;
+
+        let origins = vec![
+            point(0., 1., 0.),
+            point(0.5, 1., 0.),
+            point(0., 1., 0.5),
+            point(0., 2., 0.),
+            point(0.5, 2., 0.),
+            point(0., 2., 0.5),
+        ];
+
+        let normals = vec![
+            vector(0., -1., 0.),
+            vector(0., -1., 0.),
+            vector(0., -1., 0.),
+            vector(0., 1., 0.),
+            vector(0., 1., 0.),
+            vector(0., 1., 0.),
+        ];
+
+        for (origin, normal) in zip(origins, normals) {
+            let n = cyl.local_normal_at(origin);
+            assert_eq!(n, normal);
+        }
+        
     }
 }
