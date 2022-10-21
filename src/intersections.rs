@@ -62,6 +62,7 @@ pub fn prepare_computations(
         ShapeEnum::Sphere(sphere) => normal_at(sphere, pos),
         ShapeEnum::Cube(cube) => normal_at(cube, pos),
         ShapeEnum::Cylinder(cylinder) => normal_at(cylinder, pos),
+        ShapeEnum::Cone(cone) => normal_at(cone, pos),
     };
     let eye = -ray.direction;
     let mut inside = false;
@@ -90,6 +91,7 @@ pub fn prepare_computations(
                     ShapeEnum::Plane(plane) => plane.material.refractive_index,
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
+                    ShapeEnum::Cone(cone) => cone.material.refractive_index,
                 };
             }
         }
@@ -109,6 +111,7 @@ pub fn prepare_computations(
                     ShapeEnum::Plane(plane) => plane.material.refractive_index,
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
+                    ShapeEnum::Cone(cone) => cone.material.refractive_index,
                 };
             }
         }

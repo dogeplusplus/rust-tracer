@@ -131,6 +131,7 @@ pub fn pattern_at_shape(mut pattern: Pattern, shape: ShapeEnum, point: Tuple) ->
         ShapeEnum::Sphere(sphere) => sphere.get_transform().inverse().unwrap(),
         ShapeEnum::Cube(cube) => cube.get_transform().inverse().unwrap(),
         ShapeEnum::Cylinder(cylinder) => cylinder.get_transform().inverse().unwrap(),
+        ShapeEnum::Cone(cone) => cone.get_transform().inverse().unwrap(),
     };
     let world_point = shape_inv * point;
     let pattern_point = pattern_inv * world_point;
