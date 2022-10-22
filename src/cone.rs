@@ -96,7 +96,7 @@ impl Shape for Cone {
 fn check_cap(ray: Ray, t: f32, y: f32) -> bool {
     let x = ray.origin.x + t * ray.direction.x;
     let z = ray.origin.z + t * ray.direction.z;
-    f32::powi(x, 2) + f32::powi(z, 2) <= y
+    f32::powi(x, 2) + f32::powi(z, 2) <= f32::powi(y, 2)
 }
 
 fn intersect_caps(cone: Cone, ray: Ray, xs: &mut Vec<Intersection>) {
