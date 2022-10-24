@@ -1,6 +1,7 @@
 mod tests {
     use std::f32::consts::PI;
 
+    use tracer::group::Group;
     use tracer::materials::Material;
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
@@ -9,11 +10,12 @@ mod tests {
     use tracer::Tuple;
     use tracer::{point, vector};
 
-    #[derive(Clone, Copy)]
+    #[derive(Clone)]
     struct TestShape {
         material: Material,
         saved_ray: Ray,
         transform: Matrix<f32, 4, 4>,
+        parent: Option<Group>,
     }
     impl TestShape {
         fn new() -> Self {
@@ -30,6 +32,7 @@ mod tests {
                     direction: vector(0., 0., 0.),
                 },
                 transform: identity,
+                parent: None,
             }
         }
     }
@@ -92,7 +95,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut s = TestShape::new();
         s.set_transform(scaling(2., 2., 2.));
-        let _xs = intersect(s, r);
+        let _xs = intersect(&s, r);
         assert_eq!(s.saved_ray.origin, point(0., 0., -2.5));
         assert_eq!(s.saved_ray.direction, vector(0., 0., 0.5));
     }
@@ -103,7 +106,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut s = TestShape::new();
         s.set_transform(translation(5., 0., 0.));
-        let _xs = intersect(s, r);
+        let _xs = intersect(&s, r);
         assert_eq!(s.saved_ray.origin, point(-5., 0., -5.));
         assert_eq!(s.saved_ray.direction, vector(0., 0., 1.));
     }
@@ -112,7 +115,7 @@ mod tests {
     fn test_normal_translated_shape() {
         let mut s = TestShape::new();
         s.set_transform(translation(0., 1., 0.));
-        let n = normal_at(s, point(0., 1.70711, -0.70711));
+        let n = normal_at(&s, point(0., 1.70711, -0.70711));
         assert_eq!(n, vector(0., 0.7071068, -0.70710677));
     }
 
@@ -121,7 +124,13 @@ mod tests {
         let mut s = TestShape::new();
         let m = scaling(1., 0.5, 1.) * rotation_z(PI / 5.);
         s.set_transform(m);
-        let n = normal_at(s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
+        let n = normal_at(&s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
         assert_eq!(n, vector(-0.000000020444226, 0.97014254, -0.24253564));
+    }
+
+    #[test]
+    fn test_shape_parent() {
+        let s = TestShape::new();
+        assert!(s.parent.is_none());
     }
 }

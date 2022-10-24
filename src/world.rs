@@ -14,19 +14,19 @@ use crate::{
     sphere::Sphere,
     cone::Cone,
     transforms::scaling,
-    Color, Tuple,
+    Color, Tuple, group::Group,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ShapeEnum {
     Sphere(Sphere),
     Plane(Plane),
     Cube(Cube),
     Cylinder(Cylinder),
     Cone(Cone),
+    Group(Box<Group>),
 }
 
-#[derive(Clone)]
 pub struct World {
     pub objects: Vec<ShapeEnum>,
     pub light: Option<PointLight>,
@@ -73,33 +73,35 @@ pub fn contains(world: &World, object: ShapeEnum) -> bool {
 pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
     let mut intersections = Vec::new();
     for obj in &world.objects {
-        let obj_intersects = match *obj {
+        let obj_intersects = match obj {
             ShapeEnum::Plane(plane) => intersect(plane, ray),
             ShapeEnum::Sphere(sphere) => intersect(sphere, ray),
             ShapeEnum::Cube(cube) => intersect(cube, ray),
             ShapeEnum::Cylinder(cylinder) => intersect(cylinder, ray),
             ShapeEnum::Cone(cone) => intersect(cone, ray),
+            ShapeEnum::Group(group) => intersect(&(**group), ray),
         };
         intersections.extend(obj_intersects);
     }
-    intersections.sort_by(|&a, &b| (a.t).partial_cmp(&b.t).unwrap());
+    intersections.sort_by(|a, b| (a.t).partial_cmp(&b.t).unwrap());
     intersections
 }
 
-pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color {
-    let material = match comps.object {
+pub fn shade_hit(world: &World, comps: &Precomputation, remaining: u16) -> Color {
+    let material = match &comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Group(group) => group.material,
     };
 
-    let reflected = reflected_color(world, comps, remaining);
-    let refracted = refracted_color(world, comps, remaining);
+    let reflected = reflected_color(world, &comps, remaining);
+    let refracted = refracted_color(world, &comps, remaining);
     let light = lighting(
         material,
-        comps.object,
+        comps.clone().object,
         world.light.unwrap(),
         comps.over_point,
         comps.eyev,
@@ -108,7 +110,7 @@ pub fn shade_hit(world: &World, comps: Precomputation, remaining: u16) -> Color 
     );
 
     if material.reflective > 0. && material.transparency > 0. {
-        let reflectance = shlick(comps);
+        let reflectance = shlick(&comps);
         light + reflected * reflectance + refracted * (1. - reflectance)
     } else {
         light + reflected + refracted
@@ -124,7 +126,7 @@ pub fn color_at(world: &World, ray: Ray, remaining: u16) -> Color {
     }
 
     let comps = prepare_computations(hits.unwrap(), ray, intersections);
-    shade_hit(world, comps, remaining)
+    shade_hit(world, &comps, remaining)
 }
 
 pub fn is_shadowed(world: &World, point: Tuple) -> bool {
@@ -147,17 +149,18 @@ pub fn is_shadowed(world: &World, point: Tuple) -> bool {
     }
 }
 
-pub fn reflected_color(w: &World, comps: Precomputation, remaining: u16) -> Color {
+pub fn reflected_color(w: &World, comps: &Precomputation, remaining: u16) -> Color {
     if remaining < 1 {
         return Color::new(0., 0., 0.);
     }
 
-    let material = match comps.object {
+    let material = match &comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Group(group) => group.material,
     };
 
     if material.reflective == 0. {
@@ -170,7 +173,7 @@ pub fn reflected_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     color * material.reflective
 }
 
-pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Color {
+pub fn refracted_color(w: &World, comps: &Precomputation, remaining: u16) -> Color {
     let black = Color::new(0., 0., 0.);
 
     if remaining < 1 {
@@ -193,12 +196,13 @@ pub fn refracted_color(w: &World, comps: Precomputation, remaining: u16) -> Colo
     let direction = comps.normalv * (n_ratio * cos_i - cos_t) - comps.eyev * n_ratio;
     let refract_ray = Ray::new(comps.under_point, direction);
 
-    let material = match comps.object {
+    let material = match &comps.object {
         ShapeEnum::Sphere(sphere) => sphere.material,
         ShapeEnum::Plane(plane) => plane.material,
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Group(group) => group.material,
     };
 
     let color = color_at(w, refract_ray, remaining - 1) * material.transparency;

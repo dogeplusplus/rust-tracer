@@ -84,7 +84,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut s = Sphere::default();
         s.set_transform(scaling(2., 2., 2.));
-        let xs = intersect(s, r);
+        let xs = intersect(&s, r);
 
         assert_eq!(xs.len(), 2);
         assert_eq!(xs[0].t, 3.);
@@ -96,28 +96,28 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let mut s = Sphere::default();
         s.set_transform(translation(5., 0., 0.));
-        let xs = intersect(s, r);
+        let xs = intersect(&s, r);
         assert_eq!(xs.len(), 0);
     }
 
     #[test]
     fn test_normal() {
         let s = Sphere::default();
-        let n = normal_at(s, point(1., 0., 0.));
+        let n = normal_at(&s, point(1., 0., 0.));
         assert_eq!(n, vector(1., 0., 0.));
     }
 
     #[test]
     fn test_normal_y() {
         let s = Sphere::default();
-        let n = normal_at(s, point(0., 1., 0.));
+        let n = normal_at(&s, point(0., 1., 0.));
         assert_eq!(n, vector(0., 1., 0.));
     }
 
     #[test]
     fn test_normal_z() {
         let s = Sphere::default();
-        let n = normal_at(s, point(0., 0., 1.));
+        let n = normal_at(&s, point(0., 0., 1.));
         assert_eq!(n, vector(0., 0., 1.));
     }
 
@@ -125,7 +125,7 @@ mod tests {
     fn test_normal_non_axial() {
         let s = Sphere::default();
         let x = f32::sqrt(3.) / 3.;
-        let n = normal_at(s, point(x, x, x));
+        let n = normal_at(&s, point(x, x, x));
         let diff = n - vector(x, x, x);
         assert!(magnitude(diff) < 1e-5);
     }
@@ -134,7 +134,7 @@ mod tests {
     fn test_normal_unit_vector() {
         let s = Sphere::default();
         let x = f32::sqrt(3.) / 3.;
-        let n = normal_at(s, point(x, x, x));
+        let n = normal_at(&s, point(x, x, x));
         let diff = n - normalize(n);
         assert!(magnitude(diff) < 1e-5);
     }
@@ -143,7 +143,7 @@ mod tests {
     fn test_normal_translated_sphere() {
         let mut s = Sphere::default();
         s.set_transform(translation(0., 1., 0.));
-        let n = normal_at(s, point(0., 1.70711, -0.70711));
+        let n = normal_at(&s, point(0., 1.70711, -0.70711));
         let diff = n - vector(0., 0.70711, -0.70711);
         assert!(magnitude(diff) < 1e-5);
     }
@@ -153,7 +153,7 @@ mod tests {
         let mut s = Sphere::default();
         let m = scaling(1., 0.5, 1.) * rotation_z(PI / 5.);
         s.set_transform(m);
-        let n = normal_at(s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
+        let n = normal_at(&s, point(0., f32::sqrt(2.) / 2., -f32::sqrt(2.) / 2.));
         let diff = n - vector(0., 0.97014, -0.24254);
         assert!(magnitude(diff) < 1e-5);
     }

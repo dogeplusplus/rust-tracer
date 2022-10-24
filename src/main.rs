@@ -4,6 +4,7 @@ use std::io::Write;
 use tracer::camera::render;
 use tracer::camera::Camera;
 use tracer::canvas::canvas_to_ppm;
+use tracer::cone::Cone;
 use tracer::cube::Cube;
 use tracer::lights::PointLight;
 use tracer::materials::Material;
@@ -92,6 +93,15 @@ fn main() -> Result<(), &'static str> {
     cylinder.material.refractive_index = 0.5;
     cylinder.material.transparency = 0.7;
 
+    let mut cone = Cone::default();
+    cone.maximum = 2.;
+    cone.minimum = -2.;
+    cone.set_transform(translation(4., 4., -2.) * scaling(0.1, 1., 0.1));
+    cone.material.reflective = 0.5;
+    cone.material.refractive_index = 0.5;
+    cone.material.transparency = 0.7;
+    
+
 
     let mut world = World::default();
     world.objects = vec![
@@ -102,6 +112,7 @@ fn main() -> Result<(), &'static str> {
         ShapeEnum::Cube(cube4),
         ShapeEnum::Cube(cube5),
         ShapeEnum::Cylinder(cylinder),
+        ShapeEnum::Cone(cone),
     ];
     world.light = Some(PointLight::new(
         point(-10., 10., -10.),

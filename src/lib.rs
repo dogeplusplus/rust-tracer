@@ -19,6 +19,7 @@ pub mod sphere;
 pub mod transforms;
 pub mod world;
 pub mod cone;
+pub mod group;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Tuple {

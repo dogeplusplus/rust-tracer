@@ -62,10 +62,10 @@ mod tests {
     fn test_shade_intersection() {
         let w = World::default();
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let shape = w.objects[0];
+        let shape = w.objects[0].clone();
         let i = Intersection::new(4., shape);
-        let comps = prepare_computations(i, r, vec![i]);
-        let c = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let c = shade_hit(&w, &comps, 5);
         assert_eq!(c, Color::new(0.38066, 0.47583, 0.2855))
     }
 
@@ -74,10 +74,10 @@ mod tests {
         let mut w = World::default();
         w.light = Some(PointLight::new(point(0., 0.25, 0.), Color::new(1., 1., 1.)));
         let r = Ray::new(point(0., 0., 0.), vector(0., 0., 1.));
-        let shape = w.objects[1];
+        let shape = w.objects[1].clone();
         let i = Intersection::new(0.5, shape);
-        let comps = prepare_computations(i, r, vec![i]);
-        let c = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let c = shade_hit(&w, &comps, 5);
         assert_eq!(c, Color::new(0.9049522, 0.9049522, 0.9049522));
     }
 
@@ -158,8 +158,8 @@ mod tests {
         w.objects = vec![ShapeEnum::Sphere(s1), ShapeEnum::Sphere(s2)];
         let r = Ray::new(point(0., 0., 5.), vector(0., 0., 1.));
         let i = Intersection::new(4., ShapeEnum::Sphere(s2));
-        let comps = prepare_computations(i, r, vec![i]);
-        let c = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let c = shade_hit(&w, &comps, 5);
         assert_eq!(c, Color::new(0.1, 0.1, 0.1));
     }
 
@@ -169,7 +169,7 @@ mod tests {
         let mut shape = Sphere::default();
         shape.set_transform(translation(0., 0., 1.));
         let i = Intersection::new(5., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r, vec![i]);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
         assert!(comps.over_point.z < -f32::EPSILON / 2.);
         assert!(comps.point.z > comps.over_point.z)
     }
@@ -183,9 +183,9 @@ mod tests {
             _ => panic!("Not a sphere"),
         };
         shape.material.ambient = 1.;
-        let i = Intersection::new(1., w.objects[1]);
-        let comps = prepare_computations(i, r, vec![i]);
-        let color = reflected_color(&w, comps, 5);
+        let i = Intersection::new(1., w.objects[1].clone());
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let color = reflected_color(&w, &comps, 5);
         assert_eq!(color, Color::new(0., 0., 0.));
     }
 
@@ -198,15 +198,15 @@ mod tests {
             transform: translation(0., -1., 0.),
             material,
         });
-        w.objects.push(shape);
+        w.objects.push(shape.clone());
 
         let r = Ray::new(
             point(0., 0., -3.),
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let i = Intersection::new(f32::sqrt(2.), shape);
-        let comps = prepare_computations(i, r, vec![i]);
-        let color = reflected_color(&w, comps, 5);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let color = reflected_color(&w, &comps, 5);
         assert_eq!(color, Color::new(0.19034664, 0.23793328, 0.14275998));
     }
 
@@ -219,15 +219,15 @@ mod tests {
             transform: translation(0., -1., 0.),
             material,
         });
-        w.objects.push(shape);
+        w.objects.push(shape.clone());
 
         let r = Ray::new(
             point(0., 0., -3.),
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let i = Intersection::new(f32::sqrt(2.), shape);
-        let comps = prepare_computations(i, r, vec![i]);
-        let color = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let color = shade_hit(&w, &comps, 5);
         assert_eq!(color, Color::new(0.87677, 0.92436, 0.82918));
     }
 
@@ -267,15 +267,15 @@ mod tests {
         shape.set_transform(transform);
         shape.material = material;
         let shape = ShapeEnum::Plane(shape);
-        w.objects.push(shape);
+        w.objects.push(shape.clone());
 
         let r = Ray::new(
             point(0., 0., -3.),
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let i = Intersection::new(f32::sqrt(2.), shape);
-        let comps = prepare_computations(i, r, vec![i]);
-        let color = reflected_color(&w, comps, 0);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
+        let color = reflected_color(&w, &comps, 0);
         assert_eq!(color, Color::new(0., 0., 0.));
     }
 
@@ -284,16 +284,16 @@ mod tests {
         let w = World::default();
         let shape = w.objects.first().unwrap();
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let xs = vec![Intersection::new(4., *shape), Intersection::new(6., *shape)];
-        let comps = prepare_computations(xs[0], r, xs);
-        let c = refracted_color(&w, comps, 5);
+        let xs = vec![Intersection::new(4., (*shape).clone()), Intersection::new(6., (*shape).clone())];
+        let comps = prepare_computations(xs[0].clone(), r, xs);
+        let c = refracted_color(&w, &comps, 5);
         assert_eq!(c, Color::new(0., 0., 0.));
     }
 
     #[test]
     fn test_refraction_max_depth() {
         let w = World::default();
-        let shape = w.objects[0];
+        let shape = w.objects[0].clone();
         match shape {
             ShapeEnum::Sphere(mut sphere) => {
                 sphere.material.transparency = 1.;
@@ -303,9 +303,9 @@ mod tests {
         }
 
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let xs = vec![Intersection::new(4., shape), Intersection::new(6., shape)];
-        let comps = prepare_computations(xs[0], r, xs);
-        let c = refracted_color(&w, comps, 0);
+        let xs = vec![Intersection::new(4., shape.clone()), Intersection::new(6., shape)];
+        let comps = prepare_computations(xs[0].clone(), r, xs);
+        let c = refracted_color(&w, &comps, 0);
         assert_eq!(c, Color::new(0., 0., 0.));
     }
 
@@ -318,12 +318,12 @@ mod tests {
         }
         let r = Ray::new(point(0., 0., f32::sqrt(2.) / 2.), vector(0., 1., 0.));
         let xs = vec![
-            Intersection::new(-f32::sqrt(2.) / 2., w.objects[0]),
-            Intersection::new(f32::sqrt(2.) / 2., w.objects[0]),
+            Intersection::new(-f32::sqrt(2.) / 2., w.objects[0].clone()),
+            Intersection::new(f32::sqrt(2.) / 2., w.objects[0].clone()),
         ];
 
-        let comps = prepare_computations(xs[1], r, xs);
-        let c = refracted_color(&w, comps, 5);
+        let comps = prepare_computations(xs[1].clone(), r, xs);
+        let c = refracted_color(&w, &comps, 5);
         assert_eq!(c, Color::new(0., 0., 0.));
     }
 
@@ -343,14 +343,14 @@ mod tests {
 
         let r = Ray::new(point(0., 0., 0.1), vector(0., 1., 0.));
         let xs = vec![
-            Intersection::new(-0.9899, w.objects[0]),
-            Intersection::new(-0.4899, w.objects[1]),
-            Intersection::new(0.4899, w.objects[1]),
-            Intersection::new(0.9899, w.objects[0]),
+            Intersection::new(-0.9899, w.objects[0].clone()),
+            Intersection::new(-0.4899, w.objects[1].clone()),
+            Intersection::new(0.4899, w.objects[1].clone()),
+            Intersection::new(0.9899, w.objects[0].clone()),
         ];
 
-        let comps = prepare_computations(xs[2], r, xs);
-        let c = refracted_color(&w, comps, 5);
+        let comps = prepare_computations(xs[2].clone(), r, xs);
+        let c = refracted_color(&w, &comps, 5);
         assert_eq!(c, Color::new(0., 0.99878335, 0.04724201));
     }
 
@@ -375,8 +375,8 @@ mod tests {
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let xs = vec![Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(floor))];
-        let comps = prepare_computations(xs[0], r, xs);
-        let color = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(xs[0].clone(), r, xs);
+        let color = shade_hit(&w, &comps, 5);
         assert_eq!(color, Color::new(0.93642, 0.68642, 0.68642));
     }
 
@@ -401,8 +401,8 @@ mod tests {
         w.objects.push(ShapeEnum::Sphere(ball));
 
         let xs = vec![Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(floor))];
-        let comps = prepare_computations(xs[0], r, xs);
-        let color = shade_hit(&w, comps, 5);
+        let comps = prepare_computations(xs[0].clone(), r, xs);
+        let color = shade_hit(&w, &comps, 5);
         assert_eq!(color, Color::new(0.93391, 0.69643, 0.69243));
     }
 }

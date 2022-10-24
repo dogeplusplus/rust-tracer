@@ -1,3 +1,4 @@
+
 use crate::{
     dot,
     ray::{position, Ray},
@@ -7,7 +8,7 @@ use crate::{
     Tuple,
 };
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Intersection {
     pub t: f32,
     pub object: ShapeEnum,
@@ -25,7 +26,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
         .filter(|x| x.t >= 0.)
         .collect::<Vec<Intersection>>();
     if valid_intersections.len() > 0 {
-        let mut min_intersection = valid_intersections[0];
+        let mut min_intersection = valid_intersections[0].clone();
         for intersect in valid_intersections {
             if intersect.t < min_intersection.t {
                 min_intersection = intersect;
@@ -36,7 +37,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
     None
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Precomputation {
     pub t: f32,
     pub object: ShapeEnum,
@@ -57,12 +58,13 @@ pub fn prepare_computations(
     intersections: Vec<Intersection>,
 ) -> Precomputation {
     let pos = position(ray, intersection.t);
-    let mut normal = match intersection.object {
+    let mut normal = match &intersection.object {
         ShapeEnum::Plane(plane) => normal_at(plane, pos),
         ShapeEnum::Sphere(sphere) => normal_at(sphere, pos),
         ShapeEnum::Cube(cube) => normal_at(cube, pos),
         ShapeEnum::Cylinder(cylinder) => normal_at(cylinder, pos),
         ShapeEnum::Cone(cone) => normal_at(cone, pos),
+        ShapeEnum::Group(group) => normal_at(&(**group), pos),
     };
     let eye = -ray.direction;
     let mut inside = false;
@@ -92,14 +94,15 @@ pub fn prepare_computations(
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
                     ShapeEnum::Cone(cone) => cone.material.refractive_index,
+                    ShapeEnum::Group(ref group) => group.material.refractive_index,
                 };
             }
         }
 
         if containers.contains(&inter.object) {
-            containers.retain(|&x| x != inter.object);
+            containers.retain(|x| *x != inter.object);
         } else {
-            containers.push(inter.object);
+            containers.push(inter.object.clone());
         }
 
         if inter == intersection {
@@ -112,6 +115,7 @@ pub fn prepare_computations(
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
                     ShapeEnum::Cone(cone) => cone.material.refractive_index,
+                    ShapeEnum::Group(ref group) => group.material.refractive_index,
                 };
             }
         }
@@ -132,7 +136,7 @@ pub fn prepare_computations(
     }
 }
 
-pub fn shlick(comps: Precomputation) -> f32 {
+pub fn shlick(comps: &Precomputation) -> f32 {
     let mut cos = dot(comps.eyev, comps.normalv);
 
     if comps.n1 > comps.n2 {

@@ -14,12 +14,12 @@ pub trait Shape {
     fn local_normal_at(&self, point: Tuple) -> Tuple;
 }
 
-pub fn intersect<T: Shape>(shape: T, ray: Ray) -> Vec<Intersection> {
+pub fn intersect<T: Shape>(shape: &T, ray: Ray) -> Vec<Intersection> {
     let local_ray = transform(ray, shape.get_transform().inverse().unwrap());
     shape.local_intersect(local_ray)
 }
 
-pub fn normal_at<T: Shape>(shape: T, point: Tuple) -> Tuple {
+pub fn normal_at<T: Shape>(shape: &T, point: Tuple) -> Tuple {
     let inverse = shape.get_transform().inverse().unwrap();
     let local_point = inverse * point;
     let local_normal = shape.local_normal_at(local_point);

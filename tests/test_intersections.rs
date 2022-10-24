@@ -32,7 +32,7 @@ mod tests {
         let s = Sphere::default();
         let i1 = Intersection::new(1., ShapeEnum::Sphere(s));
         let i2 = Intersection::new(2., ShapeEnum::Sphere(s));
-        let xs = vec![i1, i2];
+        let xs = vec![i1.clone(), i2];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i1);
     }
@@ -42,7 +42,7 @@ mod tests {
         let s = Sphere::default();
         let i1 = Intersection::new(-1., ShapeEnum::Sphere(s));
         let i2 = Intersection::new(1., ShapeEnum::Sphere(s));
-        let xs = vec![i1, i2];
+        let xs = vec![i1, i2.clone()];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i2);
     }
@@ -64,7 +64,7 @@ mod tests {
         let i2 = Intersection::new(7., ShapeEnum::Sphere(s));
         let i3 = Intersection::new(-3., ShapeEnum::Sphere(s));
         let i4 = Intersection::new(2., ShapeEnum::Sphere(s));
-        let xs = vec![i1, i2, i3, i4];
+        let xs = vec![i1, i2, i3, i4.clone()];
         let i = hit(xs);
         assert_eq!(i.unwrap(), i4);
     }
@@ -74,7 +74,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(4., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r, vec![i]);
+        let comps = prepare_computations(i.clone(), r, vec![i.clone()]);
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.object, i.object);
         assert_eq!(comps.point, point(0., 0., -1.));
@@ -87,7 +87,7 @@ mod tests {
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(4., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r, vec![i]);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
         assert!(!comps.inside);
     }
 
@@ -96,7 +96,7 @@ mod tests {
         let r = Ray::new(point(0., 0., 0.), vector(0., 0., 1.));
         let shape = Sphere::default();
         let i = Intersection::new(1., ShapeEnum::Sphere(shape));
-        let comps = prepare_computations(i, r, vec![i]);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
         assert_eq!(comps.point, point(0., 0., 1.));
         assert_eq!(comps.eyev, vector(0., 0., -1.));
         assert!(comps.inside);
@@ -137,7 +137,7 @@ mod tests {
 
         let r = Ray::new(point(0., 0., -4.), vector(0., 0., 1.));
         for idx in 0..results.len() {
-            let intersection = xs[idx];
+            let intersection = xs[idx].clone();
             let result = results[idx];
             let comps = prepare_computations(intersection, r, xs.clone());
             assert_eq!(comps.n1, result.0);
@@ -151,7 +151,7 @@ mod tests {
         let mut shape = glass_sphere();
         shape.transform = translation(0., 0., 1.);
         let i = Intersection::new(5., ShapeEnum::Sphere(shape));
-        let xs = vec![i];
+        let xs = vec![i.clone()];
         let comps = prepare_computations(i, r, xs);
         assert_eq!(comps.under_point.z, 1e-4);
         assert!(comps.point.z < comps.under_point.z);
@@ -165,8 +165,8 @@ mod tests {
             Intersection::new(-f32::sqrt(2.) / 2., ShapeEnum::Sphere(shape)),
             Intersection::new(f32::sqrt(2.) / 2., ShapeEnum::Sphere(shape)),
         ];
-        let comps = prepare_computations(xs[1], r, xs);
-        let reflectance = shlick(comps);
+        let comps = prepare_computations(xs[1].clone(), r, xs);
+        let reflectance = shlick(&comps);
         assert_eq!(reflectance, 1.);
     }
 
@@ -174,9 +174,9 @@ mod tests {
     fn test_shlick_perpendicular() {
         let shape = ShapeEnum::Sphere(glass_sphere());
         let r = Ray::new(point(0., 0., 0.), vector(0., 1., 0.));
-        let xs = vec![Intersection::new(-1., shape), Intersection::new(1., shape)];
-        let comps = prepare_computations(xs[1], r, xs);
-        let reflectance = shlick(comps);
+        let xs = vec![Intersection::new(-1., shape.clone()), Intersection::new(1., shape)];
+        let comps = prepare_computations(xs[1].clone(), r, xs);
+        let reflectance = shlick(&comps);
         assert_eq!(reflectance, 0.040000003);
     }
 
@@ -185,8 +185,8 @@ mod tests {
         let shape = ShapeEnum::Sphere(glass_sphere());
         let r = Ray::new(point(0., 0.99, -2.), vector(0., 0., 1.));
         let xs = vec![Intersection::new(1.8589, shape)];
-        let comps = prepare_computations(xs[0], r, xs);
-        let reflectance = shlick(comps);
+        let comps = prepare_computations(xs[0].clone(), r, xs);
+        let reflectance = shlick(&comps);
         assert_eq!(reflectance, 0.48873067);
     }
 }

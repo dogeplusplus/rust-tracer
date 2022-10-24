@@ -116,7 +116,7 @@ mod tests {
         let normalv = vector(0., 0., -1.);
         let light = PointLight::new(point(0., 0., -10.), Color::new(1., 1., 1.));
 
-        let c1 = lighting(m, obj, light, point(0.9, 0., 0.), eyev, normalv, false);
+        let c1 = lighting(m, obj.clone(), light, point(0.9, 0., 0.), eyev, normalv, false);
         let c2 = lighting(m, obj, light, point(1.1, 0., 0.), eyev, normalv, false);
         assert_eq!(c1, white);
         assert_eq!(c2, black);
@@ -136,7 +136,7 @@ mod tests {
             vector(0., -f32::sqrt(2.) / 2., f32::sqrt(2.) / 2.),
         );
         let i = Intersection::new(f32::sqrt(2.), ShapeEnum::Plane(shape));
-        let comps = prepare_computations(i, r, vec![i]);
+        let comps = prepare_computations(i.clone(), r, vec![i]);
 
         assert_eq!(
             comps.reflectv,
