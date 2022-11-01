@@ -1,18 +1,19 @@
 use crate::{
-    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray, shape::Shape,
-    vector, world::ShapeEnum, Tuple,
+    group::Group, intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray,
+    shape::Shape, vector, world::ShapeEnum, Tuple,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Cylinder {
+pub struct Cylinder<'a> {
     transform: Matrix<f32, 4, 4>,
     pub material: Material,
     pub minimum: f32,
     pub maximum: f32,
     pub closed: bool,
+    pub parent: Option<&'a Group<'a>>,
 }
 
-impl Default for Cylinder {
+impl Default for Cylinder<'_> {
     fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
@@ -26,11 +27,12 @@ impl Default for Cylinder {
             minimum: -f32::INFINITY,
             maximum: f32::INFINITY,
             closed: false,
+            parent: None,
         }
     }
 }
 
-impl Shape for Cylinder {
+impl<'a> Shape<'a> for Cylinder<'a> {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
         let a = f32::powi(ray.direction.x, 2) + f32::powi(ray.direction.z, 2);
         let b = 2. * ray.origin.x * ray.direction.x + 2. * ray.origin.z * ray.direction.z;
@@ -48,7 +50,7 @@ impl Shape for Cylinder {
         } else {
             let mut t0 = (-b - f32::sqrt(disc)) / (2. * a);
             let mut t1 = (-b + f32::sqrt(disc)) / (2. * a);
-            
+
             if t0 > t1 {
                 (t0, t1) = (t1, t0);
             }
@@ -77,6 +79,10 @@ impl Shape for Cylinder {
         self.transform = transform;
     }
 
+    fn set_parent(&mut self, parent: &'a Group) {
+        self.parent = Some(parent);
+    }
+
     fn local_normal_at(&self, point: Tuple) -> Tuple {
         let dist = f32::powi(point.x, 2) + f32::powi(point.z, 2);
         if dist < 1. && point.y >= self.maximum - f32::EPSILON {
@@ -95,7 +101,7 @@ fn check_cap(ray: Ray, t: f32) -> bool {
     f32::powi(x, 2) + f32::powi(z, 2) <= 1.
 }
 
-fn intersect_caps(cyl: Cylinder, ray: Ray, xs: &mut Vec<Intersection>) {
+fn intersect_caps<'a>(cyl: Cylinder<'a>, ray: Ray, xs: &mut Vec<Intersection<'a>>) {
     if !cyl.closed || ray.direction.y == 0. {
         return;
     }

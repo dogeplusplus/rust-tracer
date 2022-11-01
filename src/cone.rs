@@ -1,18 +1,19 @@
 use crate::{
-    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray, shape::Shape,
-    vector, world::ShapeEnum, Tuple,
+    group::Group, intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray,
+    shape::Shape, vector, world::ShapeEnum, Tuple,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Cone {
+pub struct Cone<'a> {
     transform: Matrix<f32, 4, 4>,
     pub material: Material,
     pub minimum: f32,
     pub maximum: f32,
     pub closed: bool,
+    pub parent: Option<&'a Group<'a>>,
 }
 
-impl Default for Cone {
+impl Default for Cone<'_> {
     fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
@@ -26,19 +27,22 @@ impl Default for Cone {
             minimum: -f32::INFINITY,
             maximum: f32::INFINITY,
             closed: false,
+            parent: None,
         }
     }
 }
 
-impl Shape for Cone {
+impl<'a> Shape<'a> for Cone<'a> {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
-        let a = f32::powi(ray.direction.x, 2) - f32::powi(ray.direction.y, 2) + f32::powi(ray.direction.z, 2);
-        let b = 2. * (
-            ray.origin.x * ray.direction.x - ray.origin.y * ray.direction.y + ray.origin.z * ray.direction.z
-        );
-        let c = f32::powi(ray.origin.x, 2) - f32::powi(ray.origin.y, 2) + f32::powi(ray.origin.z, 2);
+        let a = f32::powi(ray.direction.x, 2) - f32::powi(ray.direction.y, 2)
+            + f32::powi(ray.direction.z, 2);
+        let b = 2.
+            * (ray.origin.x * ray.direction.x - ray.origin.y * ray.direction.y
+                + ray.origin.z * ray.direction.z);
+        let c =
+            f32::powi(ray.origin.x, 2) - f32::powi(ray.origin.y, 2) + f32::powi(ray.origin.z, 2);
         let disc = f32::powi(b, 2) - 4. * a * c;
-    
+
         if a == 0. {
             let mut xs = Vec::new();
 
@@ -55,7 +59,7 @@ impl Shape for Cone {
         } else {
             let mut t0 = (-b - f32::sqrt(disc)) / (2. * a);
             let mut t1 = (-b + f32::sqrt(disc)) / (2. * a);
-            
+
             if t0 > t1 {
                 (t0, t1) = (t1, t0);
             }
@@ -84,13 +88,17 @@ impl Shape for Cone {
         self.transform = transform;
     }
 
+    fn set_parent(&mut self, parent: &'a Group) {
+        self.parent = Some(parent);
+    }
+
     fn local_normal_at(&self, point: Tuple) -> Tuple {
         let mut y = f32::sqrt(f32::powi(point.x, 2) + f32::powi(point.z, 2));
         if point.y > 0. {
             y = -y;
         }
         vector(point.x, y, point.z)
-    }   
+    }
 }
 
 fn check_cap(ray: Ray, t: f32, y: f32) -> bool {
@@ -99,7 +107,7 @@ fn check_cap(ray: Ray, t: f32, y: f32) -> bool {
     f32::powi(x, 2) + f32::powi(z, 2) <= f32::powi(y, 2)
 }
 
-fn intersect_caps(cone: Cone, ray: Ray, xs: &mut Vec<Intersection>) {
+fn intersect_caps<'a>(cone: Cone<'a>, ray: Ray, xs: &mut Vec<Intersection<'a>>) {
     if !cone.closed || ray.direction.y == 0. {
         return;
     }

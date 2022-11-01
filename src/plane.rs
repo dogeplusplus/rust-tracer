@@ -1,3 +1,4 @@
+use crate::group::Group;
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrix::Matrix;
@@ -7,12 +8,13 @@ use crate::world::ShapeEnum;
 use crate::Tuple;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Plane {
+pub struct Plane<'a> {
     pub transform: Matrix<f32, 4, 4>,
     pub material: Material,
+    pub parent: Option<&'a Group<'a>>,
 }
 
-impl Default for Plane {
+impl Default for Plane<'_> {
     fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
@@ -25,11 +27,12 @@ impl Default for Plane {
         Plane {
             transform: identity,
             material: mater,
+            parent: None,
         }
     }
 }
 
-impl Shape for Plane {
+impl<'a> Shape<'a> for Plane<'a> {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
         let eps = 1e-3;
         if ray.direction.y.abs() < eps {
@@ -50,5 +53,9 @@ impl Shape for Plane {
 
     fn local_normal_at(&self, _: Tuple) -> Tuple {
         Tuple::new(0., 1., 0., 0.)
+    }
+
+    fn set_parent(&mut self, parent: &'a Group) {
+        self.parent = Some(parent);
     }
 }

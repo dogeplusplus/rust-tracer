@@ -6,6 +6,7 @@ use tracer::camera::Camera;
 use tracer::canvas::canvas_to_ppm;
 use tracer::cone::Cone;
 use tracer::cube::Cube;
+use tracer::cylinder::Cylinder;
 use tracer::lights::PointLight;
 use tracer::materials::Material;
 use tracer::patterns::StripePattern;
@@ -13,7 +14,6 @@ use tracer::patterns::{CheckerPattern, Pattern, PatternType};
 use tracer::plane::Plane;
 use tracer::shape::Shape;
 use tracer::sphere::Sphere;
-use tracer::cylinder::Cylinder;
 use tracer::transforms::rotation_z;
 use tracer::transforms::{rotation_x, scaling, translation, view_transform};
 use tracer::world::{ShapeEnum, World};
@@ -100,8 +100,6 @@ fn main() -> Result<(), &'static str> {
     cone.material.reflective = 0.5;
     cone.material.refractive_index = 0.5;
     cone.material.transparency = 0.7;
-    
-
 
     let mut world = World::default();
     world.objects = vec![

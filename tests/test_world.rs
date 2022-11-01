@@ -197,6 +197,7 @@ mod tests {
         let shape = ShapeEnum::Plane(Plane {
             transform: translation(0., -1., 0.),
             material,
+            parent: None,
         });
         w.objects.push(shape.clone());
 
@@ -218,6 +219,7 @@ mod tests {
         let shape = ShapeEnum::Plane(Plane {
             transform: translation(0., -1., 0.),
             material,
+            parent: None,
         });
         w.objects.push(shape.clone());
 
@@ -284,7 +286,10 @@ mod tests {
         let w = World::default();
         let shape = w.objects.first().unwrap();
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let xs = vec![Intersection::new(4., (*shape).clone()), Intersection::new(6., (*shape).clone())];
+        let xs = vec![
+            Intersection::new(4., (*shape).clone()),
+            Intersection::new(6., (*shape).clone()),
+        ];
         let comps = prepare_computations(xs[0].clone(), r, xs);
         let c = refracted_color(&w, &comps, 5);
         assert_eq!(c, Color::new(0., 0., 0.));
@@ -303,7 +308,10 @@ mod tests {
         }
 
         let r = Ray::new(point(0., 0., -5.), vector(0., 0., 1.));
-        let xs = vec![Intersection::new(4., shape.clone()), Intersection::new(6., shape)];
+        let xs = vec![
+            Intersection::new(4., shape.clone()),
+            Intersection::new(6., shape),
+        ];
         let comps = prepare_computations(xs[0].clone(), r, xs);
         let c = refracted_color(&w, &comps, 0);
         assert_eq!(c, Color::new(0., 0., 0.));

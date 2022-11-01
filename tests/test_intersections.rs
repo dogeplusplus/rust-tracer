@@ -174,7 +174,10 @@ mod tests {
     fn test_shlick_perpendicular() {
         let shape = ShapeEnum::Sphere(glass_sphere());
         let r = Ray::new(point(0., 0., 0.), vector(0., 1., 0.));
-        let xs = vec![Intersection::new(-1., shape.clone()), Intersection::new(1., shape)];
+        let xs = vec![
+            Intersection::new(-1., shape.clone()),
+            Intersection::new(1., shape),
+        ];
         let comps = prepare_computations(xs[1].clone(), r, xs);
         let reflectance = shlick(&comps);
         assert_eq!(reflectance, 0.040000003);

@@ -1,7 +1,9 @@
 use crate::{
+    cone::Cone,
     cube::Cube,
     cylinder::Cylinder,
     dot,
+    group::Group,
     intersections::{hit, prepare_computations, shlick, Intersection, Precomputation},
     lights::{lighting, PointLight},
     magnitude,
@@ -10,29 +12,29 @@ use crate::{
     plane::Plane,
     point,
     ray::Ray,
-    shape::intersect,
+    shape::{intersect, TestShape},
     sphere::Sphere,
-    cone::Cone,
     transforms::scaling,
-    Color, Tuple, group::Group,
+    Color, Tuple,
 };
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum ShapeEnum {
-    Sphere(Sphere),
-    Plane(Plane),
-    Cube(Cube),
-    Cylinder(Cylinder),
-    Cone(Cone),
-    Group(Box<Group>),
+pub enum ShapeEnum<'a> {
+    Sphere(Sphere<'a>),
+    Plane(Plane<'a>),
+    Cube(Cube<'a>),
+    Cylinder(Cylinder<'a>),
+    Cone(Cone<'a>),
+    Test(TestShape<'a>),
+    Group(Box<Group<'a>>),
 }
 
-pub struct World {
-    pub objects: Vec<ShapeEnum>,
+pub struct World<'a> {
+    pub objects: Vec<ShapeEnum<'a>>,
     pub light: Option<PointLight>,
 }
 
-impl Default for World {
+impl Default for World<'_> {
     fn default() -> Self {
         let light = PointLight::new(point(-10., 10., -10.), Color::new(1., 1., 1.));
         let mut s1 = Sphere::default();
@@ -52,7 +54,7 @@ impl Default for World {
     }
 }
 
-impl World {
+impl World<'_> {
     pub fn new() -> Self {
         World {
             objects: Vec::new(),
@@ -70,7 +72,7 @@ pub fn contains(world: &World, object: ShapeEnum) -> bool {
     false
 }
 
-pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
+pub fn intersect_world<'a>(world: &'a World, ray: Ray) -> Vec<Intersection<'a>> {
     let mut intersections = Vec::new();
     for obj in &world.objects {
         let obj_intersects = match obj {
@@ -79,6 +81,7 @@ pub fn intersect_world(world: &World, ray: Ray) -> Vec<Intersection> {
             ShapeEnum::Cube(cube) => intersect(cube, ray),
             ShapeEnum::Cylinder(cylinder) => intersect(cylinder, ray),
             ShapeEnum::Cone(cone) => intersect(cone, ray),
+            ShapeEnum::Test(test) => intersect(test, ray),
             ShapeEnum::Group(group) => intersect(&(**group), ray),
         };
         intersections.extend(obj_intersects);
@@ -94,6 +97,7 @@ pub fn shade_hit(world: &World, comps: &Precomputation, remaining: u16) -> Color
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Test(test) => test.material,
         ShapeEnum::Group(group) => group.material,
     };
 
@@ -160,6 +164,7 @@ pub fn reflected_color(w: &World, comps: &Precomputation, remaining: u16) -> Col
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Test(test) => test.material,
         ShapeEnum::Group(group) => group.material,
     };
 
@@ -202,6 +207,7 @@ pub fn refracted_color(w: &World, comps: &Precomputation, remaining: u16) -> Col
         ShapeEnum::Cube(cube) => cube.material,
         ShapeEnum::Cylinder(cylinder) => cylinder.material,
         ShapeEnum::Cone(cone) => cone.material,
+        ShapeEnum::Test(test) => test.material,
         ShapeEnum::Group(group) => group.material,
     };
 

@@ -1,4 +1,3 @@
-
 use crate::{
     dot,
     ray::{position, Ray},
@@ -9,13 +8,13 @@ use crate::{
 };
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct Intersection {
+pub struct Intersection<'a> {
     pub t: f32,
-    pub object: ShapeEnum,
+    pub object: ShapeEnum<'a>,
 }
 
-impl Intersection {
-    pub fn new(t: f32, object: ShapeEnum) -> Self {
+impl<'a> Intersection<'a> {
+    pub fn new(t: f32, object: ShapeEnum<'a>) -> Self {
         Intersection { t, object }
     }
 }
@@ -38,9 +37,9 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
 }
 
 #[derive(Clone)]
-pub struct Precomputation {
+pub struct Precomputation<'a> {
     pub t: f32,
-    pub object: ShapeEnum,
+    pub object: ShapeEnum<'a>,
     pub point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
@@ -52,11 +51,11 @@ pub struct Precomputation {
     pub n2: f32,
 }
 
-pub fn prepare_computations(
-    intersection: Intersection,
+pub fn prepare_computations<'a>(
+    intersection: Intersection<'a>,
     ray: Ray,
     intersections: Vec<Intersection>,
-) -> Precomputation {
+) -> Precomputation<'a> {
     let pos = position(ray, intersection.t);
     let mut normal = match &intersection.object {
         ShapeEnum::Plane(plane) => normal_at(plane, pos),
@@ -64,6 +63,7 @@ pub fn prepare_computations(
         ShapeEnum::Cube(cube) => normal_at(cube, pos),
         ShapeEnum::Cylinder(cylinder) => normal_at(cylinder, pos),
         ShapeEnum::Cone(cone) => normal_at(cone, pos),
+        ShapeEnum::Test(test) => normal_at(test, pos),
         ShapeEnum::Group(group) => normal_at(&(**group), pos),
     };
     let eye = -ray.direction;
@@ -94,6 +94,7 @@ pub fn prepare_computations(
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
                     ShapeEnum::Cone(cone) => cone.material.refractive_index,
+                    ShapeEnum::Test(test) => test.material.refractive_index,
                     ShapeEnum::Group(ref group) => group.material.refractive_index,
                 };
             }
@@ -115,6 +116,7 @@ pub fn prepare_computations(
                     ShapeEnum::Cube(cube) => cube.material.refractive_index,
                     ShapeEnum::Cylinder(cylinder) => cylinder.material.refractive_index,
                     ShapeEnum::Cone(cone) => cone.material.refractive_index,
+                    ShapeEnum::Test(test) => test.material.refractive_index,
                     ShapeEnum::Group(ref group) => group.material.refractive_index,
                 };
             }

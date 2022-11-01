@@ -1,58 +1,12 @@
 mod tests {
     use std::f32::consts::PI;
 
-    use tracer::group::Group;
     use tracer::materials::Material;
     use tracer::matrix::Matrix;
     use tracer::ray::Ray;
-    use tracer::shape::{intersect, normal_at, Shape};
+    use tracer::shape::{intersect, normal_at, Shape, TestShape};
     use tracer::transforms::{rotation_z, scaling, translation};
-    use tracer::Tuple;
     use tracer::{point, vector};
-
-    #[derive(Clone)]
-    struct TestShape {
-        material: Material,
-        saved_ray: Ray,
-        transform: Matrix<f32, 4, 4>,
-        parent: Option<Group>,
-    }
-    impl TestShape {
-        fn new() -> Self {
-            let identity = Matrix::new([
-                [1., 0., 0., 0.],
-                [0., 1., 0., 0.],
-                [0., 0., 1., 0.],
-                [0., 0., 0., 1.],
-            ]);
-            TestShape {
-                material: Material::default(),
-                saved_ray: Ray {
-                    origin: point(0., 0., 0.),
-                    direction: vector(0., 0., 0.),
-                },
-                transform: identity,
-                parent: None,
-            }
-        }
-    }
-    impl Shape for TestShape {
-        fn get_transform(&self) -> Matrix<f32, 4, 4> {
-            self.transform
-        }
-
-        fn set_transform(&mut self, transform: Matrix<f32, 4, 4>) {
-            self.transform = transform
-        }
-
-        fn local_intersect(&self, _: Ray) -> Vec<tracer::intersections::Intersection> {
-            Vec::new()
-        }
-
-        fn local_normal_at(&self, point: tracer::Tuple) -> Tuple {
-            point
-        }
-    }
 
     #[test]
     fn test_default_transformation() {

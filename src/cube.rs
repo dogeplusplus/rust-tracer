@@ -1,15 +1,16 @@
 use crate::{
-    intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray, shape::Shape,
-    vector, world::ShapeEnum, Tuple,
+    group::Group, intersections::Intersection, materials::Material, matrix::Matrix, ray::Ray,
+    shape::Shape, vector, world::ShapeEnum, Tuple,
 };
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Cube {
+pub struct Cube<'a> {
     pub transform: Matrix<f32, 4, 4>,
     pub material: Material,
+    pub parent: Option<&'a Group<'a>>,
 }
 
-impl Default for Cube {
+impl Default for Cube<'_> {
     fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
@@ -20,6 +21,7 @@ impl Default for Cube {
         Cube {
             transform: identity,
             material: Material::default(),
+            parent: None,
         }
     }
 }
@@ -43,7 +45,7 @@ fn check_axis(origin: f32, direction: f32) -> [f32; 2] {
     [tmin, tmax]
 }
 
-impl Shape for Cube {
+impl<'a> Shape<'a> for Cube<'a> {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
         let [xtmin, xtmax] = check_axis(ray.origin.x, ray.direction.x);
         let [ytmin, ytmax] = check_axis(ray.origin.y, ray.direction.y);
@@ -67,6 +69,10 @@ impl Shape for Cube {
 
     fn set_transform(&mut self, transform: Matrix<f32, 4, 4>) {
         self.transform = transform;
+    }
+
+    fn set_parent(&mut self, parent: &'a Group) {
+        self.parent = Some(parent);
     }
 
     fn get_transform(&self) -> Matrix<f32, 4, 4> {

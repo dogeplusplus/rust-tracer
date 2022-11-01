@@ -25,16 +25,8 @@ mod tests {
     #[test]
     fn test_ray_strike_cylinder() {
         let cyl = Cylinder::default();
-        let origins = vec![
-            point(1., 0., -5.),
-            point(0., 0., -5.),
-            point(0.5, 0., -5.),
-        ];
-        let directions = vec![
-            vector(0., 0., 1.),
-            vector(0., 0., 1.),
-            vector(0.1, 1., 1.),
-        ];
+        let origins = vec![point(1., 0., -5.), point(0., 0., -5.), point(0.5, 0., -5.)];
+        let directions = vec![vector(0., 0., 1.), vector(0., 0., 1.), vector(0.1, 1., 1.)];
         let t0s = vec![5., 4., 6.808006];
         let t1s = vec![5., 6., 7.0886984];
 
@@ -178,6 +170,5 @@ mod tests {
             let n = cyl.local_normal_at(origin);
             assert_eq!(n, normal);
         }
-        
     }
 }

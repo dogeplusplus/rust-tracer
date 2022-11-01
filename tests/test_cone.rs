@@ -3,12 +3,12 @@ mod tests {
     use tracer::cone::Cone;
     use tracer::ray::Ray;
     use tracer::shape::Shape;
-    use tracer::{point, vector, normalize};
+    use tracer::{normalize, point, vector};
 
     #[test]
     fn test_intersect_cone_ray() {
         let shape = Cone::default();
-        
+
         // Using value close to 5 due to floating point errors
         let origins = vec![
             point(0., 0., -5.),
@@ -51,18 +51,14 @@ mod tests {
         shape.minimum = -0.5;
         shape.maximum = 0.5;
         shape.closed = true;
-        
+
         let origins = vec![
             point(0., 0., -5.),
             point(0., 0., -0.25),
             point(0., 0., -0.25),
         ];
 
-        let directions = vec![
-            vector(0., 1., 0.),
-            vector(0., 1., 1.),
-            vector(0., 1., 0.),
-        ];
+        let directions = vec![vector(0., 1., 0.), vector(0., 1., 1.), vector(0., 1., 0.)];
         let counts = vec![0, 2, 4];
 
         for idx in 0..origins.len() {
@@ -77,22 +73,16 @@ mod tests {
     fn test_cone_normal() {
         let shape = Cone::default();
 
-        let points = vec![
-            point(0., 0., 0.),
-            point(1., 1., 1.),
-            point(-1., -1., 0.),
-        ];
+        let points = vec![point(0., 0., 0.), point(1., 1., 1.), point(-1., -1., 0.)];
         let normals = vec![
             vector(0., 0., 0.),
             vector(1., -f32::sqrt(2.), 1.),
             vector(-1., 1., 0.),
         ];
-        
-        for idx in 0..points.len() {
 
+        for idx in 0..points.len() {
             let n = shape.local_normal_at(points[idx]);
             assert_eq!(n, normals[idx]);
         }
     }
-
 }

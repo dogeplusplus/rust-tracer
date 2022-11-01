@@ -1,3 +1,4 @@
+use crate::group::Group;
 use crate::intersections::Intersection;
 use crate::materials::Material;
 use crate::matrix::Matrix;
@@ -7,14 +8,15 @@ use crate::world::ShapeEnum;
 use crate::{dot, normalize, point, Tuple};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Sphere {
+pub struct Sphere<'a> {
     pub center: Tuple,
     pub radius: f32,
     pub transform: Matrix<f32, 4, 4>,
     pub material: Material,
+    pub parent: Option<&'a Group<'a>>,
 }
 
-impl Default for Sphere {
+impl Default for Sphere<'_> {
     fn default() -> Self {
         let identity = Matrix::new([
             [1., 0., 0., 0.],
@@ -27,11 +29,12 @@ impl Default for Sphere {
             radius: 1.,
             transform: identity,
             material: Material::default(),
+            parent: None,
         }
     }
 }
 
-impl Shape for Sphere {
+impl<'a> Shape<'a> for Sphere<'a> {
     fn local_intersect(&self, ray: Ray) -> Vec<Intersection> {
         let sphere_to_ray = ray.origin - point(0., 0., 0.);
         let a = dot(ray.direction, ray.direction);
@@ -56,6 +59,10 @@ impl Shape for Sphere {
         self.transform = transform;
     }
 
+    fn set_parent(&mut self, parent: &'a Group) {
+        self.parent = Some(parent);
+    }
+
     fn get_transform(&self) -> Matrix<f32, 4, 4> {
         self.transform
     }
@@ -67,7 +74,7 @@ impl Shape for Sphere {
     }
 }
 
-pub fn glass_sphere() -> Sphere {
+pub fn glass_sphere() -> Sphere<'static> {
     let mut s = Sphere::default();
     s.material.transparency = 1.0;
     s.material.refractive_index = 1.5;
